@@ -1,13 +1,15 @@
 import 'package:drip_out/authentication/presentation/screens/onboarding_screen.dart';
 import 'package:drip_out/core/configs/theme/app_theme.dart';
+import 'package:drip_out/core/dependency_injection/service_locator.dart';
 import 'package:drip_out/core/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'authentication/presentation/screens/splash_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await setupServiceLocator();
   runApp(MyApp(appRouter: AppRouter()));
 }
 

@@ -6,4 +6,5 @@ class ScreenNames {
   static const String forgotPasswordScreen = '/forgotPasswordScreen';
   static const String verificationCodeScreen = '/verificationCodeScreen';
   static const String resetPasswordScreen = '/resetPasswordScreen';
+  static const String homeScreen = '/homeScreen';
 }
