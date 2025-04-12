@@ -10,6 +10,8 @@ class MyTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
   final AutovalidateMode autovalidateMode;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
 
   const MyTextField({
     super.key,
@@ -20,6 +22,8 @@ class MyTextField extends StatefulWidget {
     this.validator,
     this.keyboardType = TextInputType.text,
     this.autovalidateMode = AutovalidateMode.disabled,
+    this.prefixIcon,
+    this.suffixIcon,
   });
 
   @override
@@ -49,7 +53,8 @@ class _MyTextFieldState extends State<MyTextField> {
             ? (_isObsecure
                 ? myIconButton(const Icon(Icons.visibility_off))
                 : myIconButton(const Icon(Icons.visibility)))
-            : null,
+            : widget.suffixIcon,
+        prefixIcon: widget.prefixIcon,
       ),
       obscureText: widget.isPasswordField ? _isObsecure : false,
     );

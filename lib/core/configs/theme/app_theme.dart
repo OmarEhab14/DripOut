@@ -29,7 +29,7 @@ class AppTheme {
         fontSize: 17,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15.r),
         borderSide: BorderSide(
           color: AppColors.primarySwatch[400]!,
         ),

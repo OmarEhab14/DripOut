@@ -1,11 +1,16 @@
+import 'package:drip_out/account/presentation/screens/account_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/forgot_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/onboarding_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/reset_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/signup_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/splash_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/verification_code_screen.dart';
+import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
+import 'package:drip_out/common/widgets/main_screen/main_screen.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/home/presentation/screens/home_screen.dart';
+import 'package:drip_out/saved/presentation/screens/saved_screen.dart';
+import 'package:drip_out/search/presentation/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../authentication/presentation/screens/login_screen.dart';
@@ -33,8 +38,18 @@ class AppRouter {
                 ));
       case ScreenNames.resetPasswordScreen:
         return MaterialPageRoute(builder: (_) => const ResetPasswordScreen());
-      case ScreenNames.homeScreen:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case ScreenNames.mainScreen:
+        return MaterialPageRoute(builder: (_) => const MainScreen());
+      // case ScreenNames.homeScreen:
+      //   return MaterialPageRoute(builder: (_) => const HomeScreen());
+      // case ScreenNames.searchScreen:
+      //   return MaterialPageRoute(builder: (_) => const SearchScreen());
+      // case ScreenNames.savedScreen:
+      //   return MaterialPageRoute(builder: (_) => const SavedScreen());
+      // case ScreenNames.cartScreen:
+      //   return MaterialPageRoute(builder: (_) => const CartScreen());
+      // case ScreenNames.accountScreen:
+      //   return MaterialPageRoute(builder: (_) => const AccountScreen());
     }
   }
 }

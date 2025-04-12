@@ -43,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             Padding(
@@ -119,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (_formKey.currentState!.validate()) {
                           String email = _emailController.text.trim();
                           String password = _passwordController.text.trim();
-                          Navigator.pushNamedAndRemoveUntil(context, ScreenNames.homeScreen, (route) => false,);
+                          Navigator.pushNamedAndRemoveUntil(context, ScreenNames.mainScreen, (route) => false,);
                         }
                       },
                     ),
