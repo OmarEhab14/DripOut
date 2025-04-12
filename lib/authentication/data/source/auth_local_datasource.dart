@@ -1,5 +1,6 @@
 import 'package:drip_out/authentication/data/models/token_model.dart';
 import 'package:drip_out/core/storage/secure_storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthLocalDatasource {
   final SecureStorageService _secureStorageService;
@@ -28,5 +29,14 @@ class AuthLocalDatasource {
 
   Future<void> deleteTokens() async {
     await _secureStorageService.deleteTokens();
+  }
+
+  Future<bool> isFirstTimeOpen() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    if (isFirstTime) {
+      await prefs.setBool('isFirstTime', false);
+    }
+    return isFirstTime;
   }
 }

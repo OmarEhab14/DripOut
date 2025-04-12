@@ -1,9 +1,12 @@
+import 'package:drip_out/common/bloc/button/button_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
-class BasicAppButton extends StatelessWidget {
+class OnboardingButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final Widget? prefixIcon;
@@ -15,7 +18,7 @@ class BasicAppButton extends StatelessWidget {
   final double prefixGap;
   final double postfixGap;
 
-  const BasicAppButton({
+  const OnboardingButton({
     super.key,
     required this.text,
     required this.onPressed,

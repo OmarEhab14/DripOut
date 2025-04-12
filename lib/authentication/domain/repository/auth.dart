@@ -11,4 +11,5 @@ abstract class AuthRepository {
   Future<bool> isLoggedIn();
   Future<ApiResult<TokenModel>> refreshToken();
   Future<ApiResult<User>> getUserProfile();
+  Future<bool> checkIfFirstTime();
 }

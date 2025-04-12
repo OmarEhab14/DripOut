@@ -1,6 +1,7 @@
 import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
 import 'package:drip_out/authentication/presentation/widgets/pin_input.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
+import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -78,7 +79,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
             BasicAppButton(
               text: 'Continue',
               onPressed: () {
-                _formKey.currentState!.validate();
+                if (_formKey.currentState!.validate()) {
+                  Navigator.pushReplacementNamed(context, ScreenNames.resetPasswordScreen);
+                }
               },
             ),
             15.verticalSpace,

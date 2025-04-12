@@ -1,9 +1,12 @@
+import 'package:drip_out/common/bloc/button/button_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
-class BasicAppButton extends StatelessWidget {
+class BlocAppButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final Widget? prefixIcon;
@@ -15,7 +18,7 @@ class BasicAppButton extends StatelessWidget {
   final double prefixGap;
   final double postfixGap;
 
-  const BasicAppButton({
+  const BlocAppButton({
     super.key,
     required this.text,
     required this.onPressed,
@@ -31,6 +34,18 @@ class BasicAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    return BlocBuilder<ButtonCubit, ButtonState>(
+      builder: (context, state) {
+        if (state is ButtonLoading) {
+          return _loading();
+        }
+        return _initial();
+      },
+    );
+  }
+
+  Widget _initial() {
     return SizedBox(
       width: width ?? double.infinity,
       height: 60.r,
@@ -41,9 +56,9 @@ class BasicAppButton extends StatelessWidget {
             foregroundColor: foregroundColor,
             side: hasBorder
                 ? BorderSide(
-                    color: AppColors.primarySwatch[300]!,
-                    width: 1.sp,
-                  )
+              color: AppColors.primarySwatch[300]!,
+              width: 1.sp,
+            )
                 : null),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,6 +75,33 @@ class BasicAppButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _loading() {
+    return SizedBox(
+      width: width ?? double.infinity,
+      height: 60.r,
+      child: ElevatedButton(
+          onPressed: null,
+          style: ElevatedButton.styleFrom(
+              backgroundColor: backgroundColor,
+              foregroundColor: foregroundColor,
+              disabledBackgroundColor: backgroundColor,
+              disabledForegroundColor: foregroundColor,
+              side: hasBorder
+                  ? BorderSide(
+                color: AppColors.primarySwatch[300]!,
+                width: 1.sp,
+              )
+                  : null),
+          child: Center(
+            child: SpinKitPulse(
+              color: backgroundColor == Colors.white60
+                  ? AppColors.primaryColor
+                  : Colors.white,
+            ),
+          )),
     );
   }
 }

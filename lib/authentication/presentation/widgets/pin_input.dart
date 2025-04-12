@@ -42,7 +42,7 @@ class PinInput extends StatelessWidget {
               validator: (value) {
                 return value == '2222' ? null : 'Pin is incorrect';
               },
-              hapticFeedbackType: HapticFeedbackType.lightImpact,
+              hapticFeedbackType: HapticFeedbackType.vibrate,
               onCompleted: (pin) {
                 debugPrint('onCompleted: $pin');
               },

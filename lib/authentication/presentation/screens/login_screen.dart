@@ -119,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (_formKey.currentState!.validate()) {
                           String email = _emailController.text.trim();
                           String password = _passwordController.text.trim();
+                          Navigator.pushNamedAndRemoveUntil(context, ScreenNames.homeScreen, (route) => false,);
                         }
                       },
                     ),
@@ -165,6 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: 'Join',
                       target: NavigationTarget.screen(ScreenNames.signupScreen),
                       context: context,
+                      isPushReplacement: true,
                     ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import 'package:drip_out/authentication/presentation/widgets/onboarding_button.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
@@ -74,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               height: 110.h,
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Center(
-                child: BasicAppButton(
+                child: OnboardingButton(
                   text: 'Get Started',
                   onPressed: () {
                     Navigator.pushReplacementNamed(

@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:drip_out/authentication/data/models/token_model.dart';
 import 'package:drip_out/core/apis_helper/api_result.dart';
 import 'package:drip_out/core/usecase/usecase.dart';
 import 'package:meta/meta.dart';
@@ -11,6 +10,7 @@ class ButtonCubit extends Cubit<ButtonState> {
 
   void execute({dynamic params, required UseCase useCase}) async {
     emit(ButtonLoading());
+    await Future.delayed(const Duration(seconds: 5));
     try {
       final ApiResult result = await useCase.call(params: params);
       if(result is Success) {

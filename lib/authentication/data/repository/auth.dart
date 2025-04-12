@@ -68,4 +68,9 @@ class AuthRepositoryImpl extends AuthRepository {
     final result = await remote.getUserProfile();
     return result;
   }
+
+  @override
+  Future<bool> checkIfFirstTime() async {
+    return await local.isFirstTimeOpen();
+  }
 }
