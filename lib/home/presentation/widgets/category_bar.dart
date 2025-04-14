@@ -2,20 +2,22 @@ import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class SliverCategoryDelegate extends SliverPersistentHeaderDelegate {
+class CategoryBar extends StatelessWidget {
   final List<String> categories;
   final int selectedIndex;
   final Function(int) onCategorySelected;
 
-  SliverCategoryDelegate({
+  const CategoryBar({
+    super.key,
     required this.categories,
     required this.selectedIndex,
     required this.onCategorySelected,
   });
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context) {
     return Container(
+      height: 60.h,
       color: Colors.white,
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: ListView.builder(
@@ -32,10 +34,14 @@ class SliverCategoryDelegate extends SliverPersistentHeaderDelegate {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: selectedIndex == index ? AppColors.primaryColor : Colors.white,
+                  color: selectedIndex == index
+                      ? AppColors.primaryColor
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(15.r),
                   border: Border.all(
-                    color: selectedIndex == index ? AppColors.primaryColor : AppColors.primarySwatch[300]!,
+                    color: selectedIndex == index
+                        ? AppColors.primaryColor
+                        : AppColors.primarySwatch[300]!,
                   ),
                 ),
                 child: Text(
@@ -51,18 +57,5 @@ class SliverCategoryDelegate extends SliverPersistentHeaderDelegate {
         },
       ),
     );
-  }
-
-  @override
-  // TODO: implement maxExtent
-  double get maxExtent => 60.h;
-
-  @override
-  // TODO: implement minExtent
-  double get minExtent => 60.h;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
   }
 }
