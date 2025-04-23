@@ -1,4 +1,3 @@
-import 'package:drip_out/authentication/presentation/screens/onboarding_screen.dart';
 import 'package:drip_out/core/configs/theme/app_theme.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
 import 'package:drip_out/core/routes/app_router.dart';
@@ -39,10 +38,10 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.appTheme,
           initialRoute: startScreen,
           onGenerateRoute: appRouter.generateRoute,
-          home: child,
+          // home: child,
         );
       },
-      child: const OnboardingScreen(),
+      // child: const OnboardingScreen(),
     );
   }
 }

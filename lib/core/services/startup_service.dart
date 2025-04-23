@@ -17,7 +17,7 @@ class StartupService {
     } else {
       bool isAuthenticated = await checkAuthStatusUseCase.call();
       if (isAuthenticated) {
-        return ScreenNames.homeScreen;
+        return ScreenNames.mainScreen;
       }
       return ScreenNames.signupScreen;
     }

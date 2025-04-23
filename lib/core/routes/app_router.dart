@@ -18,8 +18,8 @@ import '../../authentication/presentation/screens/login_screen.dart';
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case ScreenNames.splashScreen:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+      // case ScreenNames.splashScreen:
+      //   return MaterialPageRoute(builder: (_) => const SplashScreen());
       case ScreenNames.onboardingScreen:
         return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       case ScreenNames.signupScreen:
@@ -39,7 +39,8 @@ class AppRouter {
       case ScreenNames.resetPasswordScreen:
         return MaterialPageRoute(builder: (_) => const ResetPasswordScreen());
       case ScreenNames.mainScreen:
-        return MaterialPageRoute(builder: (_) => const MainScreen());
+        final int? index = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => MainScreen(initialIndex: index ?? 0,));
       // case ScreenNames.homeScreen:
       //   return MaterialPageRoute(builder: (_) => const HomeScreen());
       // case ScreenNames.searchScreen:

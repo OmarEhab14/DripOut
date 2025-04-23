@@ -15,7 +15,8 @@ class AuthRemoteDatasource {
     return await _dioClient.post(
       ApiConstants.signUpEndpoint,
       data: {
-        'name': params.name,
+        'firstName': params.firstName,
+        'lastName': params.lastName,
         'email': params.email,
         'password': params.password,
       },

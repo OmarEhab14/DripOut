@@ -38,13 +38,13 @@ class DioInterceptor extends InterceptorsWrapper {
       final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
       final response = await refreshDio.post(
         ApiConstants.refreshTokenEndpoint,
-        data: {'refresh_token': refreshToken},
+        data: {'refreshToken': refreshToken},
       );
       if (response.statusCode == 200 && response.data != null) {
         await _secureStorageService
-            .setAccessToken(response.data['access_token']);
+            .setAccessToken(response.data['refreshToken']);
         await _secureStorageService
-            .setRefreshToken(response.data['refresh_token']);
+            .setRefreshToken(response.data['refreshToken']);
         return true;
       }
       return false;

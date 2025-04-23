@@ -118,7 +118,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     listener: (context, state) {
                       if (state is ButtonSuccess) {
                         Navigator.pushReplacementNamed(
-                            context, ScreenNames.homeScreen);
+                            context, ScreenNames.mainScreen);
                       } else if (state is ButtonFailure) {
                         var snackBar =
                             SnackBar(content: Text(state.errorMessage));
@@ -225,8 +225,14 @@ class _SignupScreenState extends State<SignupScreen> {
             String fullName = _fullNameController.text.trim();
             String email = _emailController.text.trim();
             String password = _passwordController.text.trim();
+            List<String> nameParts = fullName.trim().split(' ');
+
+            String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+            String lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
             SignupReqParams params = SignupReqParams(
-              name: fullName,
+              firstName: firstName,
+              lastName: lastName,
               email: email,
               password: password,
             );

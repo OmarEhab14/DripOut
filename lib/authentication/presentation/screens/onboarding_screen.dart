@@ -1,5 +1,4 @@
 import 'package:drip_out/authentication/presentation/widgets/onboarding_button.dart';
-import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
@@ -78,8 +77,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: OnboardingButton(
                   text: 'Get Started',
                   onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, ScreenNames.signupScreen);
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, ScreenNames.signupScreen, (route) => false,);
                   },
                   postfixIcon: RepaintBoundary(
                     child: AnimatedBuilder(
