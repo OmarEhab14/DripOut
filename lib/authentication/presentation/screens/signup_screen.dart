@@ -8,6 +8,7 @@ import 'package:drip_out/common/helpers/navigation_target.dart';
 import 'package:drip_out/common/helpers/validation.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/common/widgets/button/bloc_app_button.dart';
+import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
@@ -66,76 +67,78 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                60.verticalSpace,
-                Text(
-                  'Create an account',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                Text(
-                  'Let\'s create your account.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(color: AppColors.primarySwatch[500]),
-                ),
-                25.verticalSpace,
-                Text(
-                  'Full Name',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                5.verticalSpace,
-                fullNameTextField(),
-                15.verticalSpace,
-                Text(
-                  'Email',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                5.verticalSpace,
-                emailTextField(),
-                15.verticalSpace,
-                Text(
-                  'Password',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                5.verticalSpace,
-                passwordTextField(),
-                15.verticalSpace,
-                termsAndPolicy(),
-                15.verticalSpace,
-                BlocProvider(
-                  create: (context) => ButtonCubit(),
-                  child: BlocListener<ButtonCubit, ButtonState>(
-                    listener: (context, state) {
-                      if (state is ButtonSuccess) {
-                        Navigator.pushReplacementNamed(
-                            context, ScreenNames.mainScreen);
-                      } else if (state is ButtonFailure) {
-                        var snackBar =
-                            SnackBar(content: Text(state.errorMessage));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    },
-                    child: createAccountButton(context),
+    return DoubleTapToExit(
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  60.verticalSpace,
+                  Text(
+                    'Create an account',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                ),
-                10.verticalSpace,
-                const MySeparator(),
-                10.verticalSpace,
-                signUpWithGoogleButton(context),
-                15.verticalSpace,
-                signUpWithFacebookButton(context),
-                alreadyHaveAnAccount(),
-              ],
+                  Text(
+                    'Let\'s create your account.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(color: AppColors.primarySwatch[500]),
+                  ),
+                  25.verticalSpace,
+                  Text(
+                    'Full Name',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  5.verticalSpace,
+                  fullNameTextField(),
+                  15.verticalSpace,
+                  Text(
+                    'Email',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  5.verticalSpace,
+                  emailTextField(),
+                  15.verticalSpace,
+                  Text(
+                    'Password',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  5.verticalSpace,
+                  passwordTextField(),
+                  15.verticalSpace,
+                  termsAndPolicy(),
+                  15.verticalSpace,
+                  BlocProvider(
+                    create: (context) => ButtonCubit(),
+                    child: BlocListener<ButtonCubit, ButtonState>(
+                      listener: (context, state) {
+                        if (state is ButtonSuccess) {
+                          Navigator.pushReplacementNamed(
+                              context, ScreenNames.mainScreen);
+                        } else if (state is ButtonFailure) {
+                          var snackBar =
+                              SnackBar(content: Text(state.errorMessage));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      },
+                      child: createAccountButton(context),
+                    ),
+                  ),
+                  10.verticalSpace,
+                  const MySeparator(),
+                  10.verticalSpace,
+                  signUpWithGoogleButton(context),
+                  15.verticalSpace,
+                  signUpWithFacebookButton(context),
+                  alreadyHaveAnAccount(),
+                ],
+              ),
             ),
           ),
         ),

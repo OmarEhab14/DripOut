@@ -1,12 +1,13 @@
 import 'package:drip_out/account/presentation/screens/account_screen.dart';
 import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
+import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/home/presentation/screens/home_screen.dart';
 import 'package:drip_out/saved/presentation/screens/saved_screen.dart';
 import 'package:drip_out/search/presentation/screens/search_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -55,20 +56,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-
-        final bool isExitWarning = DateTime.now().difference(timeBackPressed) >=
-            const Duration(seconds: 2);
-        timeBackPressed = DateTime.now();
-        if (isExitWarning) {
-          Fluttertoast.showToast(msg: "Press back again to exit");
-        } else {
-          Navigator.of(context).pop(result);
-        }
-      },
+    return DoubleTapToExit(
       child: Scaffold(
         body: IndexedStack(
           index: currentIndex,
