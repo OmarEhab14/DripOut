@@ -58,9 +58,11 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<ApiResult<bool>> logout() async {
-    final result = await remote.logout();
+    /// ToDo: Logout with the server
+    // final result = await remote.logout();
     await local.deleteTokens();
-    return result;
+    // return result;
+    return const Success<bool>(true);
   }
 
   @override

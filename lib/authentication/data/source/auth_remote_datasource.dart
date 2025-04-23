@@ -46,7 +46,7 @@ class AuthRemoteDatasource {
     return await _dioClient.post(
       ApiConstants.refreshTokenEndpoint,
       data: {
-        'refresh_token': refreshToken,
+        'refreshToken': refreshToken,
       },
       converter: (data) => TokenModel.fromJson(data),
     );

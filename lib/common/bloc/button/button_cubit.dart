@@ -6,9 +6,10 @@ import 'package:meta/meta.dart';
 part 'button_state.dart';
 
 class ButtonCubit extends Cubit<ButtonState> {
-  ButtonCubit() : super(ButtonInitial());
+  final UseCase useCase;
+  ButtonCubit(this.useCase) : super(ButtonInitial());
 
-  void execute({dynamic params, required UseCase useCase}) async {
+  void execute({dynamic params}) async {
     emit(ButtonLoading());
     // await Future.delayed(const Duration(seconds: 5));
     try {

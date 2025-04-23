@@ -34,7 +34,7 @@ class _DoubleTapToExitState extends State<DoubleTapToExit> {
           });
           Fluttertoast.showToast(
               msg: widget.message ?? 'Press back again to exit',
-              backgroundColor: widget.backgroundColor ?? AppColors.primaryColor);
+              backgroundColor: widget.backgroundColor ?? AppColors.primaryColor,);
         } else {
           setState(() {
             canPopNow = true;

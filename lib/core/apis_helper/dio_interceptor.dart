@@ -42,9 +42,10 @@ class DioInterceptor extends InterceptorsWrapper {
       );
       if (response.statusCode == 200 && response.data != null) {
         await _secureStorageService
-            .setAccessToken(response.data['refreshToken']);
+            .setRefreshToken(response.data['token']);
         await _secureStorageService
-            .setRefreshToken(response.data['refreshToken']);
+            .setAccessToken(response.data['refreshToken']);
+
         return true;
       }
       return false;

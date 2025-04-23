@@ -115,7 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   termsAndPolicy(),
                   15.verticalSpace,
                   BlocProvider(
-                    create: (context) => ButtonCubit(),
+                    create: (context) => ButtonCubit(sl<SignUpUseCase>()),
                     child: BlocListener<ButtonCubit, ButtonState>(
                       listener: (context, state) {
                         if (state is ButtonSuccess) {
@@ -231,7 +231,8 @@ class _SignupScreenState extends State<SignupScreen> {
             List<String> nameParts = fullName.trim().split(' ');
 
             String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
-            String lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+            String lastName =
+                nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
             SignupReqParams params = SignupReqParams(
               firstName: firstName,
@@ -239,9 +240,7 @@ class _SignupScreenState extends State<SignupScreen> {
               email: email,
               password: password,
             );
-            context
-                .read<ButtonCubit>()
-                .execute(useCase: sl<SignUpUseCase>(), params: params);
+            context.read<ButtonCubit>().execute(params: params);
           }
         },
       );

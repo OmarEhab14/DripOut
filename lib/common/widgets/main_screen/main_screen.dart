@@ -1,13 +1,23 @@
+import 'package:dio/dio.dart';
+import 'package:drip_out/account/data/repository/user_repo_impl.dart';
+import 'package:drip_out/account/data/source/account_remote_datasource.dart';
+import 'package:drip_out/account/domain/usecases/get_user_usecase.dart';
+import 'package:drip_out/account/presentation/bloc/user_cubit.dart';
 import 'package:drip_out/account/presentation/screens/account_screen.dart';
 import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
 import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
+import 'package:drip_out/core/apis_helper/dio_client.dart';
+import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
+import 'package:drip_out/core/storage/secure_storage_service.dart';
 import 'package:drip_out/home/presentation/screens/home_screen.dart';
 import 'package:drip_out/saved/presentation/screens/saved_screen.dart';
 import 'package:drip_out/search/presentation/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -68,48 +78,48 @@ class _MainScreenState extends State<MainScreen> {
           // height: 60.h,
           child: _showBottomNavBar
               ? BottomNavigationBar(
-                  onTap: (index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                  currentIndex: currentIndex,
-                  backgroundColor: Colors.white,
-                  type: BottomNavigationBarType.fixed,
-                  selectedItemColor: AppColors.primaryColor,
-                  unselectedItemColor: Colors.grey,
-                  selectedLabelStyle:
-                      const TextStyle(fontWeight: FontWeight.w600),
-                  unselectedLabelStyle:
-                      const TextStyle(fontWeight: FontWeight.w600),
-                  items: [
-                    BottomNavigationBarItem(
-                        icon: currentIndex == 0
-                            ? SvgPicture.asset(AppVectors.homeIcon)
-                            : SvgPicture.asset(AppVectors.homeIconInactive),
-                        label: 'Home'),
-                    BottomNavigationBarItem(
-                        icon: currentIndex == 1
-                            ? SvgPicture.asset(AppVectors.searchIcon)
-                            : SvgPicture.asset(AppVectors.searchIconInactive),
-                        label: 'Search'),
-                    BottomNavigationBarItem(
-                        icon: currentIndex == 2
-                            ? SvgPicture.asset(AppVectors.loveIcon)
-                            : SvgPicture.asset(AppVectors.loveIconInactive),
-                        label: 'Saved'),
-                    BottomNavigationBarItem(
-                        icon: currentIndex == 3
-                            ? SvgPicture.asset(AppVectors.cartIcon)
-                            : SvgPicture.asset(AppVectors.cartIconInactive),
-                        label: 'Cart'),
-                    BottomNavigationBarItem(
-                        icon: currentIndex == 4
-                            ? SvgPicture.asset(AppVectors.accountIcon)
-                            : SvgPicture.asset(AppVectors.accountIconInactive),
-                        label: 'Account'),
-                  ],
-                )
+            onTap: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+            currentIndex: currentIndex,
+            backgroundColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: AppColors.primaryColor,
+            unselectedItemColor: Colors.grey,
+            selectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w600),
+            unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w600),
+            items: [
+              BottomNavigationBarItem(
+                  icon: currentIndex == 0
+                      ? SvgPicture.asset(AppVectors.homeIcon)
+                      : SvgPicture.asset(AppVectors.homeIconInactive),
+                  label: 'Home'),
+              BottomNavigationBarItem(
+                  icon: currentIndex == 1
+                      ? SvgPicture.asset(AppVectors.searchIcon)
+                      : SvgPicture.asset(AppVectors.searchIconInactive),
+                  label: 'Search'),
+              BottomNavigationBarItem(
+                  icon: currentIndex == 2
+                      ? SvgPicture.asset(AppVectors.loveIcon)
+                      : SvgPicture.asset(AppVectors.loveIconInactive),
+                  label: 'Saved'),
+              BottomNavigationBarItem(
+                  icon: currentIndex == 3
+                      ? SvgPicture.asset(AppVectors.cartIcon)
+                      : SvgPicture.asset(AppVectors.cartIconInactive),
+                  label: 'Cart'),
+              BottomNavigationBarItem(
+                  icon: currentIndex == 4
+                      ? SvgPicture.asset(AppVectors.accountIcon)
+                      : SvgPicture.asset(AppVectors.accountIconInactive),
+                  label: 'Account'),
+            ],
+          )
               : const SizedBox.shrink(),
         ),
       ),
