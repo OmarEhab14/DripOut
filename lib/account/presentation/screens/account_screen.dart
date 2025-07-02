@@ -6,7 +6,7 @@ import 'package:drip_out/account/presentation/bloc/user_cubit.dart';
 import 'package:drip_out/authentication/domain/use_cases/logout_usecase.dart';
 import 'package:drip_out/common/bloc/button/button_cubit.dart';
 import 'package:drip_out/common/widgets/button/bloc_app_button.dart';
-import 'package:drip_out/core/apis_helper/dio_client.dart';
+import 'package:drip_out/core/apis_helper/authentication_client.dart';
 import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
@@ -56,10 +56,9 @@ class AccountScreen extends StatelessWidget {
                 GetUserUseCase(
                   UserRepoImpl(
                     AccountRemoteDataSource(
-                      DioClient(
-                        Dio(),
-                        SecureStorageService(FlutterSecureStorage()),
-                        [DioInterceptor(SecureStorageService(FlutterSecureStorage()))],
+                      AuthenticationClient(
+                        dio: Dio(),
+                        dioInterceptors: [RefreshTokenInterceptor(SecureStorageService(const FlutterSecureStorage()))],
                       ),
                     ),
                   ),

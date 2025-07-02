@@ -6,7 +6,7 @@ import 'package:drip_out/account/presentation/bloc/user_cubit.dart';
 import 'package:drip_out/account/presentation/screens/account_screen.dart';
 import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
 import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
-import 'package:drip_out/core/apis_helper/dio_client.dart';
+import 'package:drip_out/core/apis_helper/authentication_client.dart';
 import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
@@ -73,9 +73,8 @@ class _MainScreenState extends State<MainScreen> {
           children: screens,
         ),
         bottomNavigationBar: AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          // height: _showBottomNavBar ? 60.h : 0,
-          // height: 60.h,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
           child: _showBottomNavBar
               ? BottomNavigationBar(
             onTap: (index) {

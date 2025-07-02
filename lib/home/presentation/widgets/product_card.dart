@@ -13,76 +13,97 @@ class ProductCard extends StatelessWidget {
   final double? discount;
   final void Function() onLovePressed;
 
-  const ProductCard({super.key, required this.onTap, required this.image, required this.title, required this.price, this.discount, required this.onLovePressed});
+  const ProductCard(
+      {super.key,
+      required this.onTap,
+      required this.image,
+      required this.title,
+      required this.price,
+      this.discount,
+      required this.onLovePressed});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15.r),
-      child: InkWell(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    // Get the screen size to make responsive adjustments
+    final screenSize = MediaQuery.of(context).size;
+    final cardWidth = (screenSize.width / 2) - 30;
+
+    // Adjust image height based on screen size
+    final imageHeight = cardWidth * 1.12;
+    return SizedBox(
+      height: 350.h,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15.r),
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            width: cardWidth,
+            child: Stack(
               children: [
-                SizedBox(
-                  height: 200.r,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.r),
-                      child: image,
-                )),
-                5.verticalSpace,
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600),
-                ),
-                5.verticalSpace,
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '\$$price',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primarySwatch[500]),
+                    SizedBox(
+                      height: imageHeight,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15.r),
+                        child: image,
+                      ),
                     ),
-                    5.horizontalSpace,
-                    discount != null ?
-                    Text('-$discount%',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        )) : const SizedBox.shrink(),
+                    5.verticalSpace,
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                    ),
+                    5.verticalSpace,
+                    Row(
+                      children: [
+                        Text(
+                          '\$$price',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primarySwatch[500]),
+                        ),
+                        5.horizontalSpace,
+                        discount != null
+                            ? Text('-$discount%',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.red,
+                                ))
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
+                    // 10.verticalSpace,
                   ],
-                )
+                ),
+                Positioned(
+                  right: 5.w,
+                  top: 5.h,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: AppColors.primarySwatch[500]!,
+                            spreadRadius: 0.3,
+                            blurRadius: 30,
+                            offset: const Offset(0, 15))
+                      ],
+                    ),
+                    child: BasicIconButton(
+                      icon: SvgPicture.asset(AppVectors.loveIcon),
+                      onPressed: onLovePressed,
+                      backgroundColor: Colors.white,
+                      size: 5.r,
+                    ),
+                  ),
+                ),
               ],
             ),
-            Positioned(
-              right: 5.w,
-              top: 5.h,
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        color: AppColors.primarySwatch[500]!,
-                        spreadRadius: 0.3,
-                        blurRadius: 30,
-                        offset: const Offset(0, 15))
-                  ],
-                ),
-                child: BasicIconButton(
-                  icon: SvgPicture.asset(AppVectors.loveIcon),
-                  onPressed: onLovePressed,
-                  backgroundColor: Colors.white,
-                  size: 5.r,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

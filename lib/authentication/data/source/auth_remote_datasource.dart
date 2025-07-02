@@ -51,11 +51,4 @@ class AuthRemoteDatasource {
       converter: (data) => TokenModel.fromJson(data),
     );
   }
-
-  Future<ApiResult<User>> getUserProfile() async {
-    return await _dioClient.get(
-      ApiConstants.userProfileEndpoint,
-      converter: (data) => User.fromJson(data),
-    );
-  }
 }

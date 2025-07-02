@@ -178,8 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
             String email = _emailController.text.trim();
             String password = _passwordController.text.trim();
             LoginReqParams params = LoginReqParams(email: email, password: password);
-            // Navigator.pushNamedAndRemoveUntil(context, ScreenNames.mainScreen, (predicate) => false);
-            context.read<ButtonCubit>().execute(params: params);
+            Navigator.pushNamedAndRemoveUntil(context, ScreenNames.mainScreen, (predicate) => false);
+            // context.read<ButtonCubit>().execute(params: params);
           }
         },
       );

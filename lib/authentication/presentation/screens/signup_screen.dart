@@ -29,37 +29,44 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // validation objects
-  final Validation _emailValidation = EmailValidation();
-  final PasswordValidation _passwordValidation = PasswordValidation();
+  late final Validation _emailValidation = EmailValidation();
+  late final Validation _passwordValidation = PasswordValidation();
+  late final Validation _nameValidation = FullNameValidation();
 
   // focus nodes
-  late final FocusNode _fullNameFocusNode;
+  late final FocusNode _firstNameFocusNode;
+  late final FocusNode _lastNameFocusNode;
   late final FocusNode _emailFocusNode;
   late final FocusNode _passwordFocusNode;
 
   // text editing controllers
-  late final TextEditingController _fullNameController;
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
 
   @override
   void initState() {
     super.initState();
-    _fullNameFocusNode = FocusNode();
+    _firstNameFocusNode = FocusNode();
+    _lastNameFocusNode = FocusNode();
     _emailFocusNode = FocusNode();
     _passwordFocusNode = FocusNode();
 
-    _fullNameController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _fullNameFocusNode.dispose();
+    _firstNameFocusNode.dispose();
+    _lastNameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
-    _fullNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -91,12 +98,51 @@ class _SignupScreenState extends State<SignupScreen> {
                         ?.copyWith(color: AppColors.primarySwatch[500]),
                   ),
                   25.verticalSpace,
-                  Text(
-                    'Full Name',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'First Name',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            5.verticalSpace,
+                            firstNameTextField(),
+                          ],
+                        ),
+                      ),
+                      10.horizontalSpace,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Last Name',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            5.verticalSpace,
+                            lastNameTextField(),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                  5.verticalSpace,
-                  fullNameTextField(),
+                  // Text(
+                  //   'First Name',
+                  //   style: Theme.of(context).textTheme.headlineSmall,
+                  // ),
+                  // 5.verticalSpace,
+                  // firstNameTextField(),
+                  // 15.verticalSpace,
+                  // Text(
+                  //   'Last Name',
+                  //   style: Theme.of(context).textTheme.headlineSmall,
+                  // ),
+                  // 5.verticalSpace,
+                  // lastNameTextField(),
                   15.verticalSpace,
                   Text(
                     'Email',
@@ -179,21 +225,23 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget fullNameTextField() {
+  Widget firstNameTextField() {
     return MyTextField(
-      controller: _fullNameController,
-      focusNode: _fullNameFocusNode,
-      hintText: 'Enter your full name',
+      controller: _firstNameController,
+      focusNode: _firstNameFocusNode,
+      hintText: 'First name',
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (value) {
-        value = value?.trim();
-        if (value == null || value.isEmpty) {
-          return 'Please, enter your full name';
-        } else if (value.length < 2 || value.length > 20) {
-          return 'Must be 2-20 characters long';
-        }
-        return null;
-      },
+      validator: (value) => _nameValidation.validate(value),
+    );
+  }
+
+  Widget lastNameTextField() {
+    return MyTextField(
+      controller: _lastNameController,
+      focusNode: _lastNameFocusNode,
+      hintText: 'Last name',
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) => _nameValidation.validate(value),
     );
   }
 
@@ -225,14 +273,15 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: AppColors.primaryColor,
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            String fullName = _fullNameController.text.trim();
+            String firstName = _firstNameController.text.trim();
+            String lastName = _lastNameController.text.trim();
             String email = _emailController.text.trim();
             String password = _passwordController.text.trim();
-            List<String> nameParts = fullName.trim().split(' ');
-
-            String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
-            String lastName =
-                nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+            // List<String> nameParts = fullName.trim().split(' ');
+            //
+            // String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+            // String lastName =
+            //     nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
             SignupReqParams params = SignupReqParams(
               firstName: firstName,

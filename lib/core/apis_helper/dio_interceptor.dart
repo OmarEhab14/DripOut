@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:drip_out/core/apis_helper/api_constants.dart';
 import 'package:drip_out/core/storage/secure_storage_service.dart';
 
-class DioInterceptor extends InterceptorsWrapper {
+class RefreshTokenInterceptor extends InterceptorsWrapper {
   final SecureStorageService _secureStorageService;
 
-  DioInterceptor(this._secureStorageService);
+  RefreshTokenInterceptor(this._secureStorageService);
 
   @override
   void onRequest(

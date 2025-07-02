@@ -1,10 +1,12 @@
 import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
 import 'package:drip_out/common/widgets/button/basic_icon_button.dart';
+import 'package:drip_out/common/widgets/search_bar/app_search_bar.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/home/presentation/widgets/category_bar.dart';
 import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
+import 'package:drip_out/home/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:drip_out/home/presentation/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -32,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -57,14 +60,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _showFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return FilterBottomSheet();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final dynamicAspectRatio = (screenWidth / 2 - 30) / (screenHeight * 0.32);
     return Scaffold(
       body: Column(
         children: [
           BasicAppBar(onNotificationsPressed: () {}, title: 'Discover'),
           AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
             height: _showSearchBar ? 75.h : 0,
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
@@ -73,24 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: MyTextField(
-                        hintText: 'Search for clothes...',
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 15.r),
-                          child:
-                              SvgPicture.asset(AppVectors.searchIconInactive),
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: () {},
-                          icon: SvgPicture.asset(AppVectors.micIcon),
-                        ),
-                      ),
+                    const Expanded(
+                      child: AppSearchBar(),
                     ),
                     8.horizontalSpace,
                     BasicIconButton(
                       icon: SvgPicture.asset(AppVectors.filterIcon),
-                      onPressed: () {},
+                      onPressed: () {
+                        _showFilterBottomSheet(context);
+                      },
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
                       size: 60.r,
@@ -116,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 5.h,
                 crossAxisSpacing: 20.w,
-                childAspectRatio: 0.6.w,
+                childAspectRatio: dynamicAspectRatio,
               ),
               padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
               itemCount: 20,

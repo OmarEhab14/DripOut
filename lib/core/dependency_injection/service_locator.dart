@@ -4,12 +4,11 @@ import 'package:drip_out/authentication/data/source/auth_local_datasource.dart';
 import 'package:drip_out/authentication/data/source/auth_remote_datasource.dart';
 import 'package:drip_out/authentication/domain/use_cases/check_auth_status_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/check_first_time_usecase.dart';
-import 'package:drip_out/authentication/domain/use_cases/get_user_profile_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/login_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/logout_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/refresh_token_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/signup_usecase.dart';
-import 'package:drip_out/core/apis_helper/dio_client.dart';
+import 'package:drip_out/core/apis_helper/authentication_client.dart';
 import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
 import 'package:drip_out/core/services/startup_service.dart';
 import 'package:drip_out/core/storage/secure_storage_service.dart';
@@ -19,20 +18,24 @@ import 'package:get_it/get_it.dart';
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
+  //dio
   sl.registerLazySingleton(() => Dio());
+  //secure storage
   sl.registerLazySingleton(() => const FlutterSecureStorage());
+  //secure storage service
   sl.registerLazySingleton(() => SecureStorageService(sl<FlutterSecureStorage>()));
-  sl.registerFactoryParam<DioClient, List<InterceptorsWrapper>, void>((interceptors, _) {
+  //authentication client
+  sl.registerFactoryParam<AuthenticationClient, List<InterceptorsWrapper>, void>((interceptors, _) {
     final dio = sl<Dio>();
-    final storageService = sl<SecureStorageService>();
-    return DioClient(dio, storageService, interceptors);
+    // final storageService = sl<SecureStorageService>();
+    return AuthenticationClient(dio: dio, dioInterceptors: interceptors);
   });
-  sl.registerLazySingleton(() => DioInterceptor(sl<SecureStorageService>()));
-  sl.registerLazySingleton(() => AuthRemoteDatasource(sl<DioClient>(param1: [sl<DioInterceptor>()])));
+  // dio interceptor
+  sl.registerLazySingleton(() => RefreshTokenInterceptor(sl<SecureStorageService>()));
+  sl.registerLazySingleton(() => AuthRemoteDatasource(sl<AuthenticationClient>(param1: [sl<RefreshTokenInterceptor>()])));
   sl.registerLazySingleton(() => AuthLocalDatasource(sl<SecureStorageService>()));
   sl.registerLazySingleton(() => AuthRepositoryImpl(local: sl<AuthLocalDatasource>(), remote: sl<AuthRemoteDatasource>()));
   sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl<AuthRepositoryImpl>()));
-  sl.registerLazySingleton(() => GetUserProfileUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => SignUpUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepositoryImpl>()));

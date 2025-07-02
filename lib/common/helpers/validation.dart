@@ -67,3 +67,16 @@ enum PasswordStrength {
   final String message;
   const PasswordStrength(this.message);
 }
+
+class FullNameValidation extends Validation {
+  @override
+  String? validate(String? value) {
+    final trimmedValue = value?.trim();
+    if (trimmedValue == null || trimmedValue.isEmpty) {
+      return 'Enter your name';
+    } else if (trimmedValue.length < 2 || trimmedValue.length > 20) {
+      return 'Must be 2-20 characters long';
+    }
+    return null;
+  }
+}

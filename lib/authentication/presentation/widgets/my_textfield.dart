@@ -8,6 +8,7 @@ class MyTextField extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
   final TextInputType keyboardType;
   final AutovalidateMode autovalidateMode;
   final Widget? prefixIcon;
@@ -24,6 +25,7 @@ class MyTextField extends StatefulWidget {
     this.autovalidateMode = AutovalidateMode.disabled,
     this.prefixIcon,
     this.suffixIcon,
+    this.onChanged,
   });
 
   @override
@@ -41,6 +43,7 @@ class _MyTextFieldState extends State<MyTextField> {
       keyboardType: widget.keyboardType,
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
+      onChanged: widget.onChanged,
       style: const TextStyle(
         fontWeight: FontWeight.w500,
         fontSize: 17,
