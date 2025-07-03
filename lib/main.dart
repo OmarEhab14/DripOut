@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:drip_out/core/configs/theme/app_theme.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
 import 'package:drip_out/core/routes/app_router.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  log('Flutter initialized');
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -15,7 +18,10 @@ void main() async {
   ]);
 
   await setupServiceLocator();
+  log('service locator has initialized');
   final startScreen = await sl<StartupService>().determineStartupScreen();
+
+  log('start screen has been determined');
 
   runApp(MyApp(appRouter: AppRouter(), startScreen: startScreen,));
 }

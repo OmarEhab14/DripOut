@@ -1,13 +1,11 @@
 import 'package:drip_out/authentication/data/models/login_req_params.dart';
 import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/data/models/token_model.dart';
-import 'package:drip_out/authentication/data/models/user.dart';
 import 'package:drip_out/authentication/data/source/auth_local_datasource.dart';
 import 'package:drip_out/authentication/data/source/auth_remote_datasource.dart';
 import 'package:drip_out/authentication/domain/repository/auth.dart';
 import 'package:drip_out/core/apis_helper/api_error_model.dart';
 import 'package:drip_out/core/apis_helper/api_result.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   final AuthLocalDatasource local;
@@ -68,5 +66,14 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<bool> checkIfFirstTime() async {
     return await local.isFirstTimeOpen();
+  }
+
+  @override
+  Future<ApiResult<TokenModel>> loginWithGoogle() async {
+    final result = await remote.loginWithGoogle();
+    if (result is Success<TokenModel>) {
+      local.saveTokens(result.data);
+    }
+    return result;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:drip_out/authentication/data/models/signup_req_params.dart';
+import 'package:drip_out/authentication/domain/use_cases/login_with_google_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/signup_usecase.dart';
 import 'package:drip_out/authentication/presentation/widgets/link_text_span.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
@@ -179,7 +180,22 @@ class _SignupScreenState extends State<SignupScreen> {
                   10.verticalSpace,
                   const MySeparator(),
                   10.verticalSpace,
-                  signUpWithGoogleButton(context),
+                  BlocProvider(
+                    create: (context) => ButtonCubit(sl<LoginWithGoogleUseCase>()),
+                    child: BlocListener<ButtonCubit, ButtonState>(
+                      listener: (context, state) {
+                        if (state is ButtonSuccess) {
+                          Navigator.pushReplacementNamed(
+                              context, ScreenNames.mainScreen);
+                        } else if (state is ButtonFailure) {
+                          var snackBar =
+                              SnackBar(content: Text(state.errorMessage));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      },
+                      child: signUpWithGoogleButton(context),
+                    ),
+                  ),
                   15.verticalSpace,
                   signUpWithFacebookButton(context),
                   alreadyHaveAnAccount(),
@@ -298,9 +314,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget signUpWithGoogleButton(BuildContext context) {
     return Builder(builder: (context) {
-      return BasicAppButton(
+      return BlocAppButton(
         text: 'Sign Up with Google',
-        onPressed: () {},
+        onPressed: () {
+          context.read<ButtonCubit>().execute();
+        },
         backgroundColor: Colors.white60,
         foregroundColor: AppColors.primaryColor,
         // prefixIcon: const FaIcon(FontAwesomeIcons.google),
