@@ -1,4 +1,4 @@
-import 'package:drip_out/common/bloc/button/button_cubit.dart';
+import 'package:drip_out/common/bloc/usecase_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,9 +35,9 @@ class BlocAppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return BlocBuilder<ButtonCubit, ButtonState>(
+    return BlocBuilder<UseCaseCubit, UseCaseState>(
       builder: (context, state) {
-        if (state is ButtonLoading) {
+        if (state is UseCaseLoading) {
           return _loading();
         }
         return _initial();

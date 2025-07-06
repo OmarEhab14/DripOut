@@ -6,7 +6,10 @@ class PinInput extends StatelessWidget {
   final TextEditingController pinController;
   final FocusNode focusNode;
   final GlobalKey<FormState> formKey;
-  const PinInput({required this.pinController, required this.focusNode, required this.formKey, super.key});
+  final int length;
+  final void Function(String?) onComplete;
+  final String? Function(String?)? validator;
+  const PinInput({required this.pinController, required this.focusNode, required this.formKey, super.key, required this.length, required this.onComplete, this.validator});
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +38,14 @@ class PinInput extends StatelessWidget {
           Directionality(
             textDirection: TextDirection.ltr,
             child: Pinput(
+              length: length,
               controller: pinController,
               focusNode: focusNode,
               defaultPinTheme: defaultPinTheme,
               separatorBuilder: (index) => const SizedBox(width: 8),
-              validator: (value) {
-                return value == '2222' ? null : 'Pin is incorrect';
-              },
+              validator: validator,
               hapticFeedbackType: HapticFeedbackType.vibrate,
-              onCompleted: (pin) {
-                debugPrint('onCompleted: $pin');
-              },
+              onCompleted: onComplete,
               onChanged: (value) {
                 debugPrint('onChanged: $value');
               },
@@ -69,7 +69,7 @@ class PinInput extends StatelessWidget {
               submittedPinTheme: defaultPinTheme.copyWith(
                 decoration: defaultPinTheme.decoration!.copyWith(
                   color: fillColor,
-                  borderRadius: BorderRadius.circular(19),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: focusedBorderColor),
                 ),
               ),

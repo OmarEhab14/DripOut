@@ -10,7 +10,9 @@ import 'package:drip_out/authentication/domain/use_cases/login_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/login_with_google_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/logout_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/refresh_token_usecase.dart';
+import 'package:drip_out/authentication/domain/use_cases/resend_verification_code_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/signup_usecase.dart';
+import 'package:drip_out/authentication/domain/use_cases/verify_usecase.dart';
 import 'package:drip_out/core/apis_helper/authentication_client.dart';
 import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
 import 'package:drip_out/core/services/startup_service.dart';
@@ -47,6 +49,8 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => SignUpUseCase(sl<AuthRepositoryImpl>()));
+  sl.registerLazySingleton(() => VerifyUseCase(sl<AuthRepositoryImpl>()));
+  sl.registerLazySingleton(() => ResendVerificationCodeUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => LoginWithGoogleUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepositoryImpl>()));

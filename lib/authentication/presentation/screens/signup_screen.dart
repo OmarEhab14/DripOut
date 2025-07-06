@@ -2,21 +2,25 @@ import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/domain/use_cases/login_with_google_usecase.dart';
 import 'package:drip_out/authentication/domain/use_cases/signup_usecase.dart';
 import 'package:drip_out/authentication/presentation/widgets/link_text_span.dart';
+import 'package:drip_out/authentication/presentation/widgets/my_text_button.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_separator.dart';
-import 'package:drip_out/common/bloc/button/button_cubit.dart';
+import 'package:drip_out/common/bloc/usecase_cubit.dart';
 import 'package:drip_out/common/helpers/navigation_target.dart';
 import 'package:drip_out/common/helpers/validation.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/common/widgets/button/bloc_app_button.dart';
+import 'package:drip_out/common/widgets/dialog/app_dialog_box.dart';
 import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
+import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -76,130 +80,146 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return DoubleTapToExit(
-      child: Scaffold(
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  60.verticalSpace,
-                  Text(
-                    'Create an account',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  Text(
-                    'Let\'s create your account.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(color: AppColors.primarySwatch[500]),
-                  ),
-                  25.verticalSpace,
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'First Name',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            5.verticalSpace,
-                            firstNameTextField(),
-                          ],
+      child: SafeArea(
+        child: Scaffold(
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    45.verticalSpace,
+                    Text(
+                      'Create an account',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Text(
+                      'Let\'s create your account.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(color: AppColors.primarySwatch[500]),
+                    ),
+                    25.verticalSpace,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'First Name',
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              5.verticalSpace,
+                              firstNameTextField(),
+                            ],
+                          ),
                         ),
+                        10.horizontalSpace,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Last Name',
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              5.verticalSpace,
+                              lastNameTextField(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    15.verticalSpace,
+                    Text(
+                      'Email',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    5.verticalSpace,
+                    emailTextField(),
+                    15.verticalSpace,
+                    Text(
+                      'Password',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    5.verticalSpace,
+                    passwordTextField(),
+                    15.verticalSpace,
+                    termsAndPolicy(),
+                    15.verticalSpace,
+                    BlocProvider(
+                      create: (context) => UseCaseCubit(sl<SignUpUseCase>()),
+                      child: BlocListener<UseCaseCubit, UseCaseState>(
+                        listener: (context, state) {
+                          if (state is UseCaseSuccess) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AppDialogBox(
+                                  icon: SvgPicture.asset(
+                                    AppVectors.successVector,
+                                    width: 80.r,
+                                  ),
+                                  title: 'Verification required!',
+                                  description:
+                                  'A verification code has been sent to your email. Please check your inbox.',
+                                  button: BasicAppButton(
+                                    text: 'Continue',
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(context,
+                                          ScreenNames.verificationCodeScreen,
+                                          arguments: _emailController.text.trim());
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (state is UseCaseFailure) {
+                            var snackBar =
+                            SnackBar(content: Text(state.errorMessage));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          }
+                        },
+                        child: createAccountButton(context),
                       ),
-                      10.horizontalSpace,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Last Name',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            5.verticalSpace,
-                            lastNameTextField(),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  // Text(
-                  //   'First Name',
-                  //   style: Theme.of(context).textTheme.headlineSmall,
-                  // ),
-                  // 5.verticalSpace,
-                  // firstNameTextField(),
-                  // 15.verticalSpace,
-                  // Text(
-                  //   'Last Name',
-                  //   style: Theme.of(context).textTheme.headlineSmall,
-                  // ),
-                  // 5.verticalSpace,
-                  // lastNameTextField(),
-                  15.verticalSpace,
-                  Text(
-                    'Email',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  5.verticalSpace,
-                  emailTextField(),
-                  15.verticalSpace,
-                  Text(
-                    'Password',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  5.verticalSpace,
-                  passwordTextField(),
-                  15.verticalSpace,
-                  termsAndPolicy(),
-                  15.verticalSpace,
-                  BlocProvider(
-                    create: (context) => ButtonCubit(sl<SignUpUseCase>()),
-                    child: BlocListener<ButtonCubit, ButtonState>(
-                      listener: (context, state) {
-                        if (state is ButtonSuccess) {
-                          Navigator.pushReplacementNamed(
-                              context, ScreenNames.mainScreen);
-                        } else if (state is ButtonFailure) {
-                          var snackBar =
-                              SnackBar(content: Text(state.errorMessage));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      },
-                      child: createAccountButton(context),
                     ),
-                  ),
-                  10.verticalSpace,
-                  const MySeparator(),
-                  10.verticalSpace,
-                  BlocProvider(
-                    create: (context) => ButtonCubit(sl<LoginWithGoogleUseCase>()),
-                    child: BlocListener<ButtonCubit, ButtonState>(
-                      listener: (context, state) {
-                        if (state is ButtonSuccess) {
-                          Navigator.pushReplacementNamed(
-                              context, ScreenNames.mainScreen);
-                        } else if (state is ButtonFailure) {
-                          var snackBar =
-                              SnackBar(content: Text(state.errorMessage));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      },
-                      child: signUpWithGoogleButton(context),
+                    10.verticalSpace,
+                    const MySeparator(),
+                    10.verticalSpace,
+                    BlocProvider(
+                      create: (context) =>
+                          UseCaseCubit(sl<LoginWithGoogleUseCase>()),
+                      child: BlocListener<UseCaseCubit, UseCaseState>(
+                        listener: (context, state) {
+                          if (state is UseCaseSuccess) {
+                            Navigator.pushReplacementNamed(
+                                context, ScreenNames.mainScreen);
+                          } else if (state is UseCaseFailure) {
+                            var snackBar =
+                                SnackBar(content: Text(state.errorMessage));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          }
+                        },
+                        child: signUpWithGoogleButton(context),
+                      ),
                     ),
-                  ),
-                  15.verticalSpace,
-                  signUpWithFacebookButton(context),
-                  alreadyHaveAnAccount(),
-                ],
+                    15.verticalSpace,
+                    signUpWithFacebookButton(context),
+                    alreadyHaveAnAccount(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -305,7 +325,7 @@ class _SignupScreenState extends State<SignupScreen> {
               email: email,
               password: password,
             );
-            context.read<ButtonCubit>().execute(params: params);
+            context.read<UseCaseCubit>().execute(params: params);
           }
         },
       );
@@ -317,7 +337,7 @@ class _SignupScreenState extends State<SignupScreen> {
       return BlocAppButton(
         text: 'Sign Up with Google',
         onPressed: () {
-          context.read<ButtonCubit>().execute();
+          context.read<UseCaseCubit>().execute();
         },
         backgroundColor: Colors.white60,
         foregroundColor: AppColors.primaryColor,
@@ -344,25 +364,18 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget alreadyHaveAnAccount() {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.0.h),
-        child: RichText(
-          text: TextSpan(
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Colors.black),
-            children: [
-              const TextSpan(
-                text: 'Already have an account? ',
-              ),
-              LinkTextSpan.build(
-                text: 'Log In',
-                target: NavigationTarget.screen(ScreenNames.loginScreen),
-                context: context,
-                isPushReplacement: true,
-              ),
-            ],
-          ),
+        padding: EdgeInsets.symmetric(vertical: 15.0.h),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Already have an account? '),
+            MyTextButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, ScreenNames.loginScreen);
+              },
+              text: 'Login',
+            ),
+          ],
         ),
       ),
     );

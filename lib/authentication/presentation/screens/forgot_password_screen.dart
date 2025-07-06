@@ -83,7 +83,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     String email = _emailController.text.trim();
-                    Navigator.pushNamed(context, ScreenNames.verificationCodeScreen, arguments:  email);
+                    Navigator.pushNamed(context, ScreenNames.resetPasswordCodeScreen, arguments:  email);
                   }
                 },
               ),

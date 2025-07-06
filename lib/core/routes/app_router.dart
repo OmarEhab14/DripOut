@@ -1,6 +1,8 @@
 import 'package:drip_out/account/presentation/screens/account_screen.dart';
+import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/presentation/screens/forgot_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/onboarding_screen.dart';
+import 'package:drip_out/authentication/presentation/screens/reset_password_code_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/reset_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/signup_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/splash_screen.dart';
@@ -36,6 +38,12 @@ class AppRouter {
             builder: (_) => VerificationCodeScreen(
                   email: email,
                 ));
+      case ScreenNames.resetPasswordCodeScreen:
+        final String email = settings.arguments as String;
+        return MaterialPageRoute(
+            builder: (_) => ResetPasswordCodeScreen(
+              email: email,
+            ));
       case ScreenNames.resetPasswordScreen:
         return MaterialPageRoute(builder: (_) => const ResetPasswordScreen());
       case ScreenNames.mainScreen:

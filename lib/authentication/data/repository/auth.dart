@@ -1,6 +1,7 @@
 import 'package:drip_out/authentication/data/models/login_req_params.dart';
 import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/data/models/token_model.dart';
+import 'package:drip_out/authentication/data/models/verification_req_params.dart';
 import 'package:drip_out/authentication/data/source/auth_local_datasource.dart';
 import 'package:drip_out/authentication/data/source/auth_remote_datasource.dart';
 import 'package:drip_out/authentication/domain/repository/auth.dart';
@@ -14,11 +15,13 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({required this.local, required this.remote});
 
   @override
-  Future<ApiResult<TokenModel>> signUp(SignupReqParams params) async {
+  Future<ApiResult<String>> signUp(SignupReqParams params) async {
+    // final result = await remote.signUp(params);
+    // if (result is Success<TokenModel>) {
+    //   local.saveTokens(result.data);
+    // }
+    // return result;
     final result = await remote.signUp(params);
-    if (result is Success<TokenModel>) {
-      local.saveTokens(result.data);
-    }
     return result;
   }
 
@@ -74,6 +77,21 @@ class AuthRepositoryImpl extends AuthRepository {
     if (result is Success<TokenModel>) {
       local.saveTokens(result.data);
     }
+    return result;
+  }
+
+  @override
+  Future<ApiResult<TokenModel>> verify(VerificationReqParams params) async {
+    final result = await remote.verify(params);
+    if (result is Success<TokenModel>) {
+      local.saveTokens(result.data);
+    }
+    return result;
+  }
+
+  @override
+  Future<ApiResult<String>> resendVerificationCode(String email) async {
+    final result = await remote.resendVerificationCode(email);
     return result;
   }
 }

@@ -69,5 +69,10 @@ class AppTheme {
       selectionColor: AppColors.primarySwatch[400],
       selectionHandleColor: AppColors.primaryColor,
     ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        overlayColor: AppColors.primarySwatch[400],
+      )
+    )
   );
 }

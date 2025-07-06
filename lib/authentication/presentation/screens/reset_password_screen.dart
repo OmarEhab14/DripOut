@@ -3,6 +3,7 @@ import 'package:drip_out/common/helpers/validation.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/common/widgets/dialog/app_dialog_box.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
+import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -115,6 +116,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AppDialogBox(
           icon: SvgPicture.asset(
@@ -128,6 +130,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             text: 'Login',
             onPressed: () {
               Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(context, ScreenNames.loginScreen, (route) => false,);
             },
           ),
         );

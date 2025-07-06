@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:drip_out/authentication/data/models/login_req_params.dart';
 import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/data/models/token_model.dart';
+import 'package:drip_out/authentication/data/models/verification_req_params.dart';
 import 'package:drip_out/authentication/domain/services/google_sign_in_service.dart';
 import 'package:drip_out/core/apis_helper/api_constants.dart';
 import 'package:drip_out/core/apis_helper/api_error_model.dart';
@@ -16,7 +17,7 @@ class AuthRemoteDatasource {
 
   AuthRemoteDatasource(this._dioClient, this._googleSignInService);
 
-  Future<ApiResult<TokenModel>> signUp(SignupReqParams params) async {
+  Future<ApiResult<String>> signUp(SignupReqParams params) async {
     return await _dioClient.post(
       ApiConstants.signUpEndpoint,
       data: {
@@ -24,6 +25,17 @@ class AuthRemoteDatasource {
         'lastName': params.lastName,
         'email': params.email,
         'password': params.password,
+      },
+      converter: (data) => data['message'],
+    );
+  }
+
+  Future<ApiResult<TokenModel>> verify(VerificationReqParams params) async {
+    return await _dioClient.post(
+      ApiConstants.verifyEndpoint,
+      data: {
+        'email': params.email,
+        'code': params.code,
       },
       converter: (data) => TokenModel.fromJson(data),
     );
@@ -48,9 +60,7 @@ class AuthRemoteDatasource {
     }
     return await _dioClient.post(
       ApiConstants.loginWithGoogleEndpoint,
-      data: {
-        'idToken': idToken
-      },
+      data: {'idToken': idToken},
       converter: (data) => TokenModel.fromJson(data),
     );
   }
@@ -69,6 +79,17 @@ class AuthRemoteDatasource {
         'refreshToken': refreshToken,
       },
       converter: (data) => TokenModel.fromJson(data),
+    );
+  }
+
+  Future<ApiResult<String>> resendVerificationCode(String email) async {
+    log('wewewewe!!!!!');
+    return await _dioClient.post(
+      ApiConstants.resendVerificationCodeEndpoint,
+      data: {
+        'email': email,
+      },
+      converter: (data) => data['message'] ?? '',
     );
   }
 }

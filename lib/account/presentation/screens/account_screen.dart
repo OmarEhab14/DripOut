@@ -4,7 +4,7 @@ import 'package:drip_out/account/data/source/account_remote_datasource.dart';
 import 'package:drip_out/account/domain/usecases/get_user_usecase.dart';
 import 'package:drip_out/account/presentation/bloc/user_cubit.dart';
 import 'package:drip_out/authentication/domain/use_cases/logout_usecase.dart';
-import 'package:drip_out/common/bloc/button/button_cubit.dart';
+import 'package:drip_out/common/bloc/usecase_cubit.dart';
 import 'package:drip_out/common/widgets/button/bloc_app_button.dart';
 import 'package:drip_out/core/apis_helper/authentication_client.dart';
 import 'package:drip_out/core/apis_helper/dio_interceptor.dart';
@@ -27,13 +27,13 @@ class AccountScreen extends StatelessWidget {
         child: Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             BlocProvider(
-              create: (context) => ButtonCubit(sl<LogoutUseCase>()),
-              child: BlocListener<ButtonCubit, ButtonState>(
+              create: (context) => UseCaseCubit(sl<LogoutUseCase>()),
+              child: BlocListener<UseCaseCubit, UseCaseState>(
                 listener: (context, state) {
-                  if (state is ButtonSuccess) {
+                  if (state is UseCaseSuccess) {
                     Navigator.pushReplacementNamed(
                         context, ScreenNames.loginScreen);
-                  } else if (state is ButtonFailure) {
+                  } else if (state is UseCaseFailure) {
                     var snackBar = SnackBar(content: Text(state.errorMessage));
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
@@ -42,7 +42,7 @@ class AccountScreen extends StatelessWidget {
                   return BlocAppButton(
                     text: 'Logout',
                     onPressed: () {
-                      context.read<ButtonCubit>().execute();
+                      context.read<UseCaseCubit>().execute();
                     },
                     backgroundColor: Colors.red,
                   );

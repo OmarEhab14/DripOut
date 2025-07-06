@@ -2,8 +2,9 @@ import 'package:drip_out/authentication/data/models/login_req_params.dart';
 import 'package:drip_out/authentication/domain/use_cases/login_usecase.dart';
 import 'package:drip_out/authentication/presentation/widgets/link_text_span.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_separator.dart';
+import 'package:drip_out/authentication/presentation/widgets/my_text_button.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
-import 'package:drip_out/common/bloc/button/button_cubit.dart';
+import 'package:drip_out/common/bloc/usecase_cubit.dart';
 import 'package:drip_out/common/helpers/navigation_target.dart';
 import 'package:drip_out/common/helpers/validation.dart';
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
@@ -49,76 +50,78 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return DoubleTapToExit(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      60.verticalSpace,
-                      Text(
-                        'Login to your account',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      Text(
-                        'It\'s great to see you again.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(color: AppColors.primarySwatch[500]),
-                      ),
-                      25.verticalSpace,
-                      Text(
-                        'Email',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      5.verticalSpace,
-                      emailTextField(),
-                      15.verticalSpace,
-                      Text(
-                        'Password',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      5.verticalSpace,
-                      passwordTextField(),
-                      15.verticalSpace,
-                      forgotPassword(),
-                      25.verticalSpace,
-                      BlocProvider(
-                        create: (context) => ButtonCubit(sl<LoginUseCase>()),
-                        child: BlocListener<ButtonCubit, ButtonState>(
-                          listener: (context, state) {
-                            if (state is ButtonSuccess) {
-                              Navigator.pushReplacementNamed(
-                                  context, ScreenNames.mainScreen);
-                            } else if (state is ButtonFailure) {
-                              var snackBar =
-                              SnackBar(content: Text(state.errorMessage));
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            }
-                          },
-                          child: loginButton(context),
+      child: SafeArea(
+        child: Scaffold(
+          body: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        45.verticalSpace,
+                        Text(
+                          'Login to your account',
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                      ),
-                      25.verticalSpace,
-                      const MySeparator(),
-                      25.verticalSpace,
-                      loginWithGoogleButton(),
-                      15.verticalSpace,
-                      loginWithFacebookButton(),
-                    ],
+                        Text(
+                          'It\'s great to see you again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(color: AppColors.primarySwatch[500]),
+                        ),
+                        25.verticalSpace,
+                        Text(
+                          'Email',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        5.verticalSpace,
+                        emailTextField(),
+                        15.verticalSpace,
+                        Text(
+                          'Password',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        5.verticalSpace,
+                        passwordTextField(),
+                        15.verticalSpace,
+                        forgotPassword(),
+                        25.verticalSpace,
+                        BlocProvider(
+                          create: (context) => UseCaseCubit(sl<LoginUseCase>()),
+                          child: BlocListener<UseCaseCubit, UseCaseState>(
+                            listener: (context, state) {
+                              if (state is UseCaseSuccess) {
+                                Navigator.pushReplacementNamed(
+                                    context, ScreenNames.mainScreen);
+                              } else if (state is UseCaseFailure) {
+                                var snackBar =
+                                SnackBar(content: Text(state.errorMessage));
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            },
+                            child: loginButton(context),
+                          ),
+                        ),
+                        25.verticalSpace,
+                        const MySeparator(),
+                        25.verticalSpace,
+                        loginWithGoogleButton(),
+                        15.verticalSpace,
+                        loginWithFacebookButton(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              80.verticalSpace,
-              doNotHaveAnAccount(),
-            ],
+                80.verticalSpace,
+                doNotHaveAnAccount(),
+              ],
+            ),
           ),
         ),
       ),
@@ -211,25 +214,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget doNotHaveAnAccount() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.0.h),
-      child: RichText(
-        text: TextSpan(
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(color: Colors.black),
-          children: [
-            const TextSpan(
-              text: 'Don\'t have an account? ',
-            ),
-            LinkTextSpan.build(
-              text: 'Join',
-              target: NavigationTarget.screen(ScreenNames.signupScreen),
-              context: context,
-              isPushReplacement: true,
-            ),
-          ],
-        ),
+      padding: EdgeInsets.symmetric(vertical: 15.0.h),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Don\'t have an account? '),
+          MyTextButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, ScreenNames.signupScreen);
+            },
+            text: 'Join',
+          ),
+        ],
       ),
     );
   }
