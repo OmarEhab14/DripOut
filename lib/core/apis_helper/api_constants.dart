@@ -11,4 +11,5 @@ class ApiConstants {
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String tokenTest = '/api/Account/TryTokens';
+  static const String productsEndpoint = '/api/Product';
 }
