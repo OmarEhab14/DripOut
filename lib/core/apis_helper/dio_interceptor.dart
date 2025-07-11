@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:drip_out/core/apis_helper/api_constants.dart';
+import 'package:drip_out/core/configs/constants/screen_names.dart';
 import 'package:drip_out/core/storage/secure_storage_service.dart';
+import 'package:drip_out/main.dart';
 
 class RefreshTokenInterceptor extends InterceptorsWrapper {
   final SecureStorageService _secureStorageService;
@@ -19,15 +21,22 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.requestOptions.headers['__internalRetryFlag__'] == true) {
+      return handler.next(err);
+    }
     if (err.response?.statusCode == 401) {
-      if (await _refreshToken()) {
+      final tokenRefreshed = await _refreshToken();
+      if (tokenRefreshed) {
+        err.requestOptions.headers['__internalRetryFlag__'] = true;
         return handler.resolve(await _retry(err.requestOptions));
       } else {
         await _secureStorageService.deleteTokens();
+        navigatorKey.currentState?.pushNamedAndRemoveUntil(ScreenNames.loginScreen, (route) => false);
       }
     }
     return handler.next(err);
   }
+
 
   Future<bool> _refreshToken() async {
     try {
@@ -42,9 +51,9 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
       );
       if (response.statusCode == 200 && response.data != null) {
         await _secureStorageService
-            .setRefreshToken(response.data['token']);
+            .setRefreshToken(response.data['refreshToken']);
         await _secureStorageService
-            .setAccessToken(response.data['refreshToken']);
+            .setAccessToken(response.data['token']);
 
         return true;
       }
@@ -54,30 +63,35 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
     }
   }
 
-  Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
+  Future<Response> _retry(RequestOptions requestOptions) async {
     final accessToken = await _secureStorageService.getAccessToken();
 
     final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
-    final newHeaders = Map<String, dynamic>.from(requestOptions.headers);
-    newHeaders['Authorization'] = 'Bearer $accessToken';
+    requestOptions.headers['Authorization'] = 'Bearer $accessToken';
 
-    final options = Options(
-      method: requestOptions.method,
-      headers: newHeaders,
-      contentType: requestOptions.contentType,
-      responseType: requestOptions.responseType,
-      validateStatus: requestOptions.validateStatus,
-      sendTimeout: requestOptions.sendTimeout,
-      receiveTimeout: requestOptions.receiveTimeout,
-    );
+    return retryDio.fetch(requestOptions); // I was using request instead of fetch but this is a light weight approach to make the same request again, but if something wrong happened, just clone the request options and use the request method instead as a safer approach
 
-    return retryDio.request(
-      requestOptions.path,
-      data: requestOptions.data,
-      options: options,
-      queryParameters: requestOptions.queryParameters,
-    );
+    // like this:
+    // final opts = Options(
+    //   method: requestOptions.method,
+    //   headers: requestOptions.headers,
+    //   responseType: requestOptions.responseType,
+    //   contentType: requestOptions.contentType,
+    //   extra: requestOptions.extra,
+    //   followRedirects: requestOptions.followRedirects,
+    //   listFormat: requestOptions.listFormat,
+    //   receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
+    //   sendTimeout: requestOptions.sendTimeout,
+    //   receiveTimeout: requestOptions.receiveTimeout,
+    //   validateStatus: requestOptions.validateStatus,
+    // );
+    //
+    // return retryDio.request(
+    //   requestOptions.path,
+    //   data: requestOptions.data,
+    //   queryParameters: requestOptions.queryParameters,
+    //   options: opts,
+    // );
   }
-
 }

@@ -1,6 +1,5 @@
-import 'package:drip_out/account/data/models/user.dart';
+import 'package:dio/dio.dart';
 import 'package:drip_out/core/apis_helper/api_constants.dart';
-import 'package:drip_out/core/apis_helper/api_result.dart';
 import 'package:drip_out/core/apis_helper/dio_client.dart';
 
 class AccountRemoteDataSource {
@@ -8,10 +7,9 @@ class AccountRemoteDataSource {
 
   AccountRemoteDataSource(this._dioClient);
 
-  Future<ApiResult<UserModel>> getUser() async {
+  Future<Response> getUser() async {
     return await _dioClient.get(
       ApiConstants.tokenTest,
-      converter: (data) => UserModel.fromJson(data),
     );
   }
 }

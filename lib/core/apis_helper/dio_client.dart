@@ -14,13 +14,12 @@ abstract class DioClient {
     dio.interceptors.addAll(dioInterceptors);
   }
 
-  Future<ApiResult<T>> get<T>(
+  Future<Response> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
-    required T Function(dynamic) converter,
   }) {
     throw UnsupportedError("Get not implemented for this client");
   }

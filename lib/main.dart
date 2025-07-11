@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   log('Flutter initialized');
@@ -23,13 +25,14 @@ void main() async {
 
   log('start screen has been determined');
 
-  runApp(MyApp(appRouter: AppRouter(), startScreen: startScreen,));
+  runApp(MyApp(appRouter: AppRouter(), startScreen: startScreen, navigatorKey: navigatorKey,));
 }
 
 class MyApp extends StatelessWidget {
   final AppRouter appRouter;
   final String? startScreen;
-  const MyApp({super.key, required this.appRouter, this.startScreen});
+  final GlobalKey<NavigatorState>? navigatorKey;
+  const MyApp({super.key, required this.appRouter, this.startScreen, this.navigatorKey});
 
   bool isTablet(BuildContext context) {
     final shortestSide = MediaQuery.of(context).size.shortestSide;
@@ -47,6 +50,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'DripOut',
+          navigatorKey: navigatorKey,
           theme: AppTheme.appTheme,
           initialRoute: startScreen,
           onGenerateRoute: appRouter.generateRoute,

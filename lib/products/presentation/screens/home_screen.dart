@@ -1,13 +1,12 @@
-import 'package:drip_out/authentication/presentation/widgets/my_textfield.dart';
 import 'package:drip_out/common/widgets/button/basic_icon_button.dart';
 import 'package:drip_out/common/widgets/search_bar/app_search_bar.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
-import 'package:drip_out/home/presentation/widgets/category_bar.dart';
 import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
-import 'package:drip_out/home/presentation/widgets/filter_bottom_sheet.dart';
-import 'package:drip_out/home/presentation/widgets/product_card.dart';
+import 'package:drip_out/products/presentation/widgets/category_bar.dart';
+import 'package:drip_out/products/presentation/widgets/filter_bottom_sheet.dart';
+import 'package:drip_out/products/presentation/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

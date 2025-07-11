@@ -1,18 +1,11 @@
-import 'package:drip_out/account/presentation/screens/account_screen.dart';
-import 'package:drip_out/authentication/data/models/signup_req_params.dart';
 import 'package:drip_out/authentication/presentation/screens/forgot_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/onboarding_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/reset_password_code_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/reset_password_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/signup_screen.dart';
-import 'package:drip_out/authentication/presentation/screens/splash_screen.dart';
 import 'package:drip_out/authentication/presentation/screens/verification_code_screen.dart';
-import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
 import 'package:drip_out/common/widgets/main_screen/main_screen.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
-import 'package:drip_out/home/presentation/screens/home_screen.dart';
-import 'package:drip_out/saved/presentation/screens/saved_screen.dart';
-import 'package:drip_out/search/presentation/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../authentication/presentation/screens/login_screen.dart';
