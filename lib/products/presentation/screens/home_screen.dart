@@ -4,11 +4,16 @@ import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
+import 'package:drip_out/core/dependency_injection/service_locator.dart';
+import 'package:drip_out/products/data/models/product_model.dart';
+import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
+import 'package:drip_out/products/presentation/bloc/paginated_products_cubit.dart';
 import 'package:drip_out/products/presentation/widgets/category_bar.dart';
 import 'package:drip_out/products/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:drip_out/products/presentation/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -120,31 +125,84 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               }),
           Expanded(
-            child: GridView.builder(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              controller: _scrollController,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 5.h,
-                crossAxisSpacing: 20.w,
-                childAspectRatio: dynamicAspectRatio,
+            child: BlocProvider(
+              create: (context) =>
+                  PaginatedProductsCubit(sl<GetProductsUseCase>())..loadPage(),
+              child:
+                  BlocBuilder<PaginatedProductsCubit, PaginatedProductsState>(
+                builder: (context, state) {
+                  if (state is PaginatedProductsLoading &&
+                      state.oldProducts.isEmpty) {
+                    return Center(child: const CircularProgressIndicator());
+                  }
+
+                  final cubit = context.read<PaginatedProductsCubit>();
+
+                  List<ProductModel> products = [];
+                  bool isLoadingMore = false;
+
+                  if (state is PaginatedProductsLoading) {
+                    products = state.oldProducts;
+                    isLoadingMore = true;
+                  } else if (state is PaginatedProductsLoaded) {
+                    products = state.products;
+                  } else if (state is PaginatedProductsError) {
+                    return Center(
+                      child: Text(
+                        'Error: ${state.error.message}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
+
+                  return Stack(
+                    children: [
+                      GridView.builder(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        controller: _scrollController,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 5.h,
+                          crossAxisSpacing: 20.w,
+                          childAspectRatio: dynamicAspectRatio,
+                        ),
+                        padding:
+                            EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          cubit.checkIfNeedMoreData(index);
+                          return ProductCard(
+                            onTap: () {},
+                            image: products[index].images.isEmpty
+                                ? Image.asset(
+                                    AppImages.tshirt,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  )
+                                : Image.network(
+                                    products[index].images[0]!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  ),
+                            title: products[index].title,
+                            price: products[index].price,
+                            onLovePressed: () {},
+                            discount: products[index].discount == 0 ? null : products[index].discount,
+                          );
+                        },
+                      ),
+                      if (isLoadingMore)
+                        Positioned(
+                          bottom: 16,
+                          left: 0,
+                          right: 0,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                    ],
+                  );
+                },
               ),
-              padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
-              itemCount: 20,
-              itemBuilder: (context, index) {
-                return ProductCard(
-                  onTap: () {},
-                  image: Image.asset(
-                    AppImages.tshirt,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                  title: 'Polo Regular Fit',
-                  price: 1100,
-                  onLovePressed: () {},
-                  discount: 52,
-                );
-              },
             ),
           ),
         ],

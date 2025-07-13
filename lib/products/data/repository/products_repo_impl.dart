@@ -2,6 +2,7 @@ import 'package:drip_out/core/apis_helper/api_error_model.dart';
 import 'package:drip_out/core/apis_helper/api_result.dart';
 import 'package:drip_out/products/data/models/get_products_params.dart';
 import 'package:drip_out/products/data/models/product_model.dart';
+import 'package:drip_out/products/data/models/products_response_model.dart';
 import 'package:drip_out/products/data/source/products_remote_data_source.dart';
 import 'package:drip_out/products/domain/repository/products_repository.dart';
 
@@ -24,16 +25,15 @@ class ProductsRepoImpl extends ProductsRepository {
   }
 
   @override
-  Future<ApiResult<List<ProductModel>>> getProducts({GetProductsParams? params}) async {
+  Future<ApiResult<ProductsResponseModel>> getProducts({GetProductsParams? params}) async {
     try {
       final result = await remote.getProducts(params: params);
       final json = result.data as Map<String, dynamic>;
-      final List productsList = json['data'];
-      return Success(productsList.map((product) => ProductModel.fromJson(product)).toList());
+      return Success(ProductsResponseModel.fromJson(json));
     } on ApiErrorModel catch (e) {
       return Failure(e);
     } catch (e) {
-      return Failure(ApiErrorModel(message: 'Unknown error occurred'));
+      return Failure(ApiErrorModel(message: e.toString()));
     }
   }
 

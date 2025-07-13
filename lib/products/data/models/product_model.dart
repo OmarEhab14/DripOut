@@ -4,7 +4,7 @@ class ProductModel {
   final double price;
   final double discount;
   final double rate;
-  final List<String> images;
+  final List<String?> images;
 
   ProductModel({
     required this.id,
@@ -17,23 +17,23 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['Id'],
-      title: json['Title'],
-      price: json['Price'],
-      discount: json['Discount'],
-      rate: json['Rate'],
-      images: json['Images'],
+      id: json['id'],
+      title: json['title'],
+      price: json['price'],
+      discount: json['discount'],
+      rate: json['rate'],
+      images: (json['images'] as List<dynamic>).map((e) => e as String?).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'Id': id,
-      'Title': title,
-      'Price': price,
-      'Discount': discount,
-      'Rate': rate,
-      'Images': images,
+      'id': id,
+      'title': title,
+      'price': price,
+      'discount': discount,
+      'rate': rate,
+      'images': images,
     };
   }
 

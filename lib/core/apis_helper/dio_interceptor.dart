@@ -31,12 +31,12 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
         return handler.resolve(await _retry(err.requestOptions));
       } else {
         await _secureStorageService.deleteTokens();
-        navigatorKey.currentState?.pushNamedAndRemoveUntil(ScreenNames.loginScreen, (route) => false);
+        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+            ScreenNames.loginScreen, (route) => false);
       }
     }
     return handler.next(err);
   }
-
 
   Future<bool> _refreshToken() async {
     try {
@@ -47,13 +47,19 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
       final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
       final response = await refreshDio.post(
         ApiConstants.refreshTokenEndpoint,
-        data: {'refreshToken': refreshToken},
+        data: '"$refreshToken"',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json-patch+json',
+          },
+        ),
       );
+
+
       if (response.statusCode == 200 && response.data != null) {
         await _secureStorageService
             .setRefreshToken(response.data['refreshToken']);
-        await _secureStorageService
-            .setAccessToken(response.data['token']);
+        await _secureStorageService.setAccessToken(response.data['token']);
 
         return true;
       }
@@ -70,7 +76,8 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
 
     requestOptions.headers['Authorization'] = 'Bearer $accessToken';
 
-    return retryDio.fetch(requestOptions); // I was using request instead of fetch but this is a light weight approach to make the same request again, but if something wrong happened, just clone the request options and use the request method instead as a safer approach
+    return retryDio.fetch(
+        requestOptions); // I was using request instead of fetch but this is a light weight approach to make the same request again, but if something wrong happened, just clone the request options and use the request method instead as a safer approach
 
     // like this:
     // final opts = Options(
