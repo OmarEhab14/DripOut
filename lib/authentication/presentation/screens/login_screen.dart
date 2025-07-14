@@ -1,5 +1,6 @@
 import 'package:drip_out/authentication/data/models/login_req_params.dart';
 import 'package:drip_out/authentication/domain/use_cases/login_usecase.dart';
+import 'package:drip_out/authentication/domain/use_cases/login_with_google_usecase.dart';
 import 'package:drip_out/authentication/presentation/widgets/link_text_span.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_separator.dart';
 import 'package:drip_out/authentication/presentation/widgets/my_text_button.dart';
@@ -101,8 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context, ScreenNames.mainScreen);
                               } else if (state is UseCaseFailure) {
                                 var snackBar =
-                                SnackBar(content: Text(state.errorMessage));
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                    SnackBar(content: Text(state.errorMessage));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
                               }
                             },
                             child: loginButton(context),
@@ -111,7 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         25.verticalSpace,
                         const MySeparator(),
                         25.verticalSpace,
-                        loginWithGoogleButton(),
+                        BlocProvider(
+                          create: (context) => UseCaseCubit(sl<LoginWithGoogleUseCase>()),
+                          child: loginWithGoogleButton(context),
+                        ),
                         15.verticalSpace,
                         loginWithFacebookButton(),
                       ],
@@ -180,7 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
           if (_formKey.currentState!.validate()) {
             String email = _emailController.text.trim();
             String password = _passwordController.text.trim();
-            LoginReqParams params = LoginReqParams(email: email, password: password);
+            LoginReqParams params =
+                LoginReqParams(email: email, password: password);
             // Navigator.pushNamedAndRemoveUntil(context, ScreenNames.mainScreen, (predicate) => false);
             context.read<UseCaseCubit>().execute(params: params);
           }
@@ -189,17 +195,20 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Widget loginWithGoogleButton() {
-    return BasicAppButton(
-      text: 'Login with Google',
-      onPressed: () {},
-      backgroundColor: Colors.white60,
-      foregroundColor: AppColors.primaryColor,
-      // prefixIcon: const FaIcon(FontAwesomeIcons.google),
-      prefixIcon: Image.asset(AppImages.googleLogo, width: 42.r),
-      hasBorder: true,
-      prefixGap: 8.0,
-    );
+  Widget loginWithGoogleButton(BuildContext context) {
+    return Builder(builder: (context) {
+      return BlocAppButton(
+        text: 'Login with Google',
+        onPressed: () {
+          context.read<UseCaseCubit>().execute();
+        },
+        backgroundColor: Colors.white60,
+        foregroundColor: AppColors.primaryColor,
+        prefixIcon: Image.asset(AppImages.googleLogo, width: 42.r),
+        hasBorder: true,
+        prefixGap: 8.0,
+      );
+    });
   }
 
   Widget loginWithFacebookButton() {

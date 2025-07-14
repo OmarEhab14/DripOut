@@ -20,6 +20,7 @@ import 'package:drip_out/core/services/startup_service.dart';
 import 'package:drip_out/core/storage/secure_storage_service.dart';
 import 'package:drip_out/products/data/repository/products_repo_impl.dart';
 import 'package:drip_out/products/data/source/products_remote_data_source.dart';
+import 'package:drip_out/products/domain/usecases/get_categories_usecase.dart';
 import 'package:drip_out/products/domain/usecases/get_product_by_id_usecase.dart';
 import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -71,6 +72,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => GetProductsUseCase(sl<ProductsRepoImpl>()));
   sl.registerLazySingleton(() => GetProductByIdUseCase(sl<ProductsRepoImpl>()));
+  sl.registerLazySingleton(() => GetCategoriesUseCase(sl<ProductsRepoImpl>()));
   sl.registerLazySingleton(() => CheckIfFirstTimeUseCase(sl<AuthRepositoryImpl>()));
   sl.registerLazySingleton(() => StartupService(checkAuthStatusUseCase: sl<CheckAuthStatusUseCase>(), checkIfFirstTimeUseCase: sl<CheckIfFirstTimeUseCase>()));
 }

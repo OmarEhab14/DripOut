@@ -47,14 +47,10 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
       final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
       final response = await refreshDio.post(
         ApiConstants.refreshTokenEndpoint,
-        data: '"$refreshToken"',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json-patch+json',
-          },
-        ),
+        data: {
+          'refreshToken': refreshToken,
+        },
       );
-
 
       if (response.statusCode == 200 && response.data != null) {
         await _secureStorageService

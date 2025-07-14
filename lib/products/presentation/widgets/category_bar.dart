@@ -1,9 +1,10 @@
 import 'package:drip_out/core/configs/theme/app_colors.dart';
+import 'package:drip_out/products/data/models/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CategoryBar extends StatelessWidget {
-  final List<String> categories;
+  final List<CategoryModel> categories;
   final int selectedIndex;
   final Function(int) onCategorySelected;
 
@@ -30,7 +31,7 @@ class CategoryBar extends StatelessWidget {
           return ChoiceChip(
             padding: EdgeInsets.all(10.r),
             label: Text(
-              categories[index],
+              categories[index].name,
               style: TextStyle(
                 color: isSelected ? Colors.white : Colors.black,
                 fontWeight: FontWeight.w500,

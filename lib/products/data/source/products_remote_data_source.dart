@@ -20,4 +20,10 @@ class ProductsRemoteDataSource {
       '${ApiConstants.productsEndpoint}/$id',
     );
   }
+
+  Future<Response> getCategories() async {
+    return await _dioClient.get(
+      ApiConstants.categoriesEndpoint,
+    );
+  }
 }

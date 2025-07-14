@@ -20,7 +20,7 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
   bool isLastPage = false;
   int pageNumber = 1;
   final int pageSize = 8;
-  final int nextPageTrigger = 3;
+  final int nextPageTrigger = 1;
   bool loadingNextPage = false;
 
   Future<void> loadPage() async {
@@ -58,9 +58,16 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
     final List<ProductModel> currentProducts = state is PaginatedProductsLoaded
         ? (state as PaginatedProductsLoaded).products
         : [];
-    if (index == currentProducts.length - 1) {
+    if (index == currentProducts.length - nextPageTrigger) {
       log('getting more products');
       loadPage();
     }
+  }
+
+  Future<void> refresh() async {
+    isLastPage = false;
+    pageNumber = 1;
+    emit(PaginatedProductsLoaded([]));
+    await loadPage();
   }
 }
