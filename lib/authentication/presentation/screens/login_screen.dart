@@ -114,8 +114,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         const MySeparator(),
                         25.verticalSpace,
                         BlocProvider(
-                          create: (context) => UseCaseCubit(sl<LoginWithGoogleUseCase>()),
-                          child: loginWithGoogleButton(context),
+                          create: (context) =>
+                              UseCaseCubit(sl<LoginWithGoogleUseCase>()),
+                          child: BlocListener<UseCaseCubit, UseCaseState>(
+                            listener: (context, state) {
+                              if (state is UseCaseSuccess) {
+                                Navigator.pushReplacementNamed(
+                                    context, ScreenNames.mainScreen);
+                              } else if (state is UseCaseFailure) {
+                                var snackBar =
+                                    SnackBar(content: Text(state.errorMessage));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
+                            },
+                            child: loginWithGoogleButton(context),
+                          ),
                         ),
                         15.verticalSpace,
                         loginWithFacebookButton(),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:drip_out/core/apis_helper/api_constants.dart';
 import 'package:drip_out/core/configs/constants/screen_names.dart';
@@ -41,6 +43,7 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
   Future<bool> _refreshToken() async {
     try {
       final refreshToken = await _secureStorageService.getRefreshToken();
+      log('refresh token: ${refreshToken ?? 'refresh token is null'}');
       if (refreshToken == null) {
         return false;
       }
@@ -52,15 +55,18 @@ class RefreshTokenInterceptor extends InterceptorsWrapper {
         },
       );
 
+      log('refresh response: ${response.statusCode}, ${response.data}');
+
       if (response.statusCode == 200 && response.data != null) {
-        await _secureStorageService
-            .setRefreshToken(response.data['refreshToken']);
+        // await _secureStorageService
+        //     .setRefreshToken(response.data['refreshToken']);
         await _secureStorageService.setAccessToken(response.data['token']);
 
         return true;
       }
       return false;
     } catch (e) {
+      log('refresh token endpoint error: $e');
       return false;
     }
   }

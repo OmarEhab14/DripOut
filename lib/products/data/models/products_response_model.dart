@@ -6,6 +6,9 @@ class ProductsResponseModel {
   final int pageSize;
   final int count;
   final int totalPages;
+  final double minPrice;
+  final double maxPrice;
+  final List<String> sizes;
 
   ProductsResponseModel({
     required this.items,
@@ -13,6 +16,9 @@ class ProductsResponseModel {
     required this.pageSize,
     required this.count,
     required this.totalPages,
+    required this.minPrice,
+    required this.maxPrice,
+    required this.sizes,
   });
 
   factory ProductsResponseModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +30,9 @@ class ProductsResponseModel {
       pageSize: json['pageSize'],
       count: json['count'],
       totalPages: json['totalPages'],
+      minPrice: json['minPrice'],
+      maxPrice: json['maxPrice'],
+      sizes: List<String>.from(json['sizes']),
     );
   }
 }

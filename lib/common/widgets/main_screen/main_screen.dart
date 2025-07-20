@@ -3,11 +3,15 @@ import 'package:drip_out/cart/presentation/screens/cart_screen.dart';
 import 'package:drip_out/common/widgets/double_tap_to_exit/double_tap_to_exit.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
+import 'package:drip_out/core/dependency_injection/service_locator.dart';
+import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
+import 'package:drip_out/products/presentation/bloc/paginated_products_bloc/paginated_products_cubit.dart';
 import 'package:drip_out/products/presentation/screens/home_screen.dart';
 import 'package:drip_out/saved/presentation/screens/saved_screen.dart';
 import 'package:drip_out/search/presentation/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MainScreen extends StatefulWidget {
@@ -33,12 +37,15 @@ class _MainScreenState extends State<MainScreen> {
     currentIndex = widget.initialIndex;
     _scrollController = ScrollController();
     screens = [
-      HomeScreen(
-        onBottomNavVisibilityChanged: (shouldShow) {
-          setState(() {
-            _showBottomNavBar = shouldShow;
-          });
-        },
+      BlocProvider(
+        create: (context) => PaginatedProductsCubit(sl<GetProductsUseCase>())..loadPage(),
+        child: HomeScreen(
+          onBottomNavVisibilityChanged: (shouldShow) {
+            setState(() {
+              _showBottomNavBar = shouldShow;
+            });
+          },
+        ),
       ),
       SearchScreen(),
       SavedScreen(),

@@ -2,9 +2,9 @@ import 'package:drip_out/products/data/models/category_model.dart';
 
 class CategoriesResponseModel {
   final List<CategoryModel> categories;
-  final double minPrice;
-  final double maxPrice;
-  final List<String> sizes;
+  final int minPrice;
+  final int maxPrice;
+  final List<String>? sizes;
 
   CategoriesResponseModel({
     required this.categories,

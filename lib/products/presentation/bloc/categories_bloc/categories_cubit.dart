@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:drip_out/core/apis_helper/api_error_model.dart';
 import 'package:drip_out/core/apis_helper/api_result.dart';
@@ -17,6 +19,7 @@ class CategoriesCubit extends Cubit<CategoriesState> {
     if (result is Success<CategoriesResponseModel>) {
       emit(CategoriesSuccess(result.data));
     } else if (result is Failure<CategoriesResponseModel>) {
+      log(result.apiErrorModel.message);
       emit(CategoriesFailed(result.apiErrorModel));
     }
   }

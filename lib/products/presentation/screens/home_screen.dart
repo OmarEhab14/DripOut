@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:drip_out/common/widgets/button/basic_icon_button.dart';
 import 'package:drip_out/common/widgets/search_bar/app_search_bar.dart';
-import 'package:drip_out/core/apis_helper/api_result.dart';
 import 'package:drip_out/core/configs/assets/app_images.dart';
 import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
+import 'package:drip_out/products/data/models/get_products_params.dart';
 import 'package:drip_out/products/data/models/product_model.dart';
 import 'package:drip_out/products/domain/usecases/get_categories_usecase.dart';
 import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
@@ -21,7 +23,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(bool) onBottomNavVisibilityChanged;
@@ -36,16 +37,22 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
   late final ScrollController _scrollController;
   bool _showSearchBar = true;
+  bool _isRestoringScrollPosition = false;
 
   // List<String> categories = ['All', 'TShirts', 'Jeans', 'Shoes', 'Shirts'];
-  PaginatedProductsCubit paginatedProductsCubit =
-      PaginatedProductsCubit(sl<GetProductsUseCase>());
+  // PaginatedProductsCubit paginatedProductsCubit =
+  //     PaginatedProductsCubit(sl<GetProductsUseCase>());
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
+    _scrollController.addListener(() {
+      if (!_isRestoringScrollPosition) {
+        context.read<PaginatedProductsCubit>().saveScrollOffset(_scrollController.offset);
+      }
+    });
   }
 
   @override
@@ -73,6 +80,29 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _restoreScrollPosition() {
+    final cubit = context.read<PaginatedProductsCubit>();
+    final savedOffset = cubit.getScrollOffset(_selectedCategoryIndex);
+
+    if (savedOffset > 0 && _scrollController.hasClients) {
+      _isRestoringScrollPosition = true;
+      // Use post frame callback to ensure the list is built before scrolling
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            savedOffset,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          ).then((_) {
+            _isRestoringScrollPosition = false;
+          });
+        } else {
+          _isRestoringScrollPosition = false;
+        }
+      });
+    }
+  }
+
   void _showFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -91,8 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final dynamicAspectRatio = (screenWidth / 2 - 30) / (screenHeight * 0.32);
+    final dynamicAspectRatio = (screenWidth / 2 - 50) / (screenHeight * 0.32);
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: Column(
         children: [
           BasicAppBar(onNotificationsPressed: () {}, title: 'Discover'),
@@ -103,7 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                padding:
+                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                 color: Colors.white,
                 child: Row(
                   children: [
@@ -138,6 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         _selectedCategoryIndex = index;
                       });
+                      log('selected category index: $_selectedCategoryIndex');
+                      context.read<PaginatedProductsCubit>().reloadCachedProducts(_selectedCategoryIndex);
                     },
                   );
                 }
@@ -146,99 +180,120 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-            child: BlocProvider.value(
-              value: paginatedProductsCubit..loadPage(),
-              child:
-                  BlocBuilder<PaginatedProductsCubit, PaginatedProductsState>(
-                builder: (context, state) {
-                  if (state is PaginatedProductsLoading &&
-                      state.oldProducts.isEmpty) {
-                    return _buildShimmeredProductsGridView(dynamicAspectRatio);
-                  }
+            child:
+                BlocConsumer<PaginatedProductsCubit, PaginatedProductsState>(
+                  listener: (context, state) {
+                    if (state is PaginatedProductsLoaded && state.products.isNotEmpty) {
+                      _restoreScrollPosition();
+                    }
+                  },
+              builder: (context, state) {
+                if (state is PaginatedProductsLoading &&
+                    state.oldProducts.isEmpty) {
+                  return _buildShimmeredProductsGridView(dynamicAspectRatio);
+                }
 
-                  final cubit = context.read<PaginatedProductsCubit>();
+                final cubit = context.read<PaginatedProductsCubit>();
 
-                  List<ProductModel> products = [];
-                  bool isLoadingMore = false;
-                  bool loadingMoreDataError = false;
+                List<ProductModel> products = [];
+                bool isLoadingMore = false;
+                bool loadingMoreDataError = false;
 
-                  if (state is PaginatedProductsLoading) {
-                    products = state.oldProducts;
-                    isLoadingMore = true;
-                  } else if (state is PaginatedProductsLoaded) {
-                    products = state.products;
-                  } else if (state is PaginatedProductsError &&
-                      products.isEmpty) {
-                    return _buildProductsErrorMessage(
-                        state.error.message, cubit);
-                  } else if (state is PaginatedProductsError) {
-                    loadingMoreDataError = true;
-                  }
+                if (state is PaginatedProductsLoading) {
+                  products = state.oldProducts;
+                  isLoadingMore = true;
+                } else if (state is PaginatedProductsLoaded) {
+                  products = state.products;
+                } else if (state is PaginatedProductsError &&
+                    products.isEmpty) {
+                  return _buildProductsErrorMessage(
+                      state.error.message, cubit);
+                } else if (state is PaginatedProductsError) {
+                  loadingMoreDataError = true;
+                }
 
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: RefreshIndicator(
-                          color: AppColors.primaryColor,
-                          backgroundColor: Colors.white,
-                          onRefresh: () {
-                            return Future.delayed(Duration(seconds: 2), () {
-                              cubit.refresh();
-                            });
-                          },
-                          child: GridView.builder(
-                            keyboardDismissBehavior:
-                                ScrollViewKeyboardDismissBehavior.onDrag,
-                            controller: _scrollController,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 5.h,
-                              crossAxisSpacing: 20.w,
-                              childAspectRatio: dynamicAspectRatio,
-                            ),
-                            padding: EdgeInsets.only(
-                              left: 20.w,
-                              right: 20.w,
-                              top: 10.h,
-                            ),
-                            itemCount: products.length,
-                            itemBuilder: (context, index) {
+                return RefreshIndicator(
+                  color: AppColors.primaryColor,
+                  backgroundColor: Colors.white,
+                  onRefresh: () {
+                    return Future.delayed(Duration(seconds: 2), () {
+                      cubit.refresh();
+                    });
+                  },
+                  child: CustomScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    controller: _scrollController,
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          left: 10.w,
+                          right: 10.w,
+                          top: 5.h,
+                        ),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 5.h,
+                            crossAxisSpacing: 5.w,
+                            childAspectRatio: dynamicAspectRatio,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
                               cubit.checkIfNeedMoreData(index);
                               return ProductCard(
                                 onTap: () {},
-                                image: products[index].images.isEmpty
+                                image: products[index].image == null
                                     ? Image.asset(
-                                        AppImages.tshirt,
+                                        AppImages.shirt,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                       )
                                     : Image.network(
-                                        products[index].images[0]!,
+                                        products[index].image!,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            AppImages.productPlaceholder,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                          );
+                                        },
                                       ),
                                 title: products[index].title,
+                                description: products[index].description,
                                 price: products[index].price,
+                                rate: products[index].rate,
+                                reviews: products[index].reviews,
                                 onLovePressed: () {},
                                 discount: products[index].discount == 0
                                     ? null
                                     : products[index].discount,
                               );
                             },
+                            childCount: products.length,
                           ),
                         ),
                       ),
                       if (isLoadingMore)
-                        CircularProgressIndicator(
-                          color: AppColors.primaryColor,
-                          strokeWidth: 2.0.r,
-                          strokeCap: StrokeCap.round,
+                        SliverToBoxAdapter(
+                          child: Container(
+                            padding: EdgeInsets.all(20.h),
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryColor,
+                              strokeWidth: 2.0.r,
+                              strokeCap: StrokeCap.round,
+                            ),
+                          ),
                         ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -252,17 +307,13 @@ class _HomeScreenState extends State<HomeScreen> {
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 5.h,
-        crossAxisSpacing: 20.w,
+        crossAxisSpacing: 5.w,
         childAspectRatio: dynamicAspectRatio,
       ),
-      padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
+      padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 5.h),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.black.withAlpha(80),
-          highlightColor: Colors.grey[300]!,
-          child: ShimmeredProductCard(),
-        );
+        return ShimmeredProductCard();
       },
     );
   }

@@ -31,4 +31,26 @@ class GetProductsParams {
       if (pageSize != null) 'PageSize': pageSize,
     };
   }
+
+  GetProductsParams copyWith({
+    String? search,
+    int? categoryId,
+    int? minPrice,
+    int? maxPrice,
+    String? size,
+    String? orderBy,
+    int? page,
+    int? pageSize,
+  }) {
+    return GetProductsParams(
+      search: search ?? this.search,
+      categoryId: categoryId ?? this.categoryId,
+      minPrice: minPrice ?? this.minPrice,
+      maxPrice: maxPrice ?? this.maxPrice,
+      size: size ?? this.size,
+      orderBy: orderBy ?? this.orderBy,
+      page: page ?? this.page,
+      pageSize: pageSize ?? this.pageSize,
+    );
+  }
 }

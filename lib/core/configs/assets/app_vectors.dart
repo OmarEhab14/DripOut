@@ -21,4 +21,5 @@ class AppVectors {
   static const String accountIconInactive = '${basePath}account_icon_inactive$format';
   static const String noSavedItemsIcon = '${basePath}no_saved_items$format';
   static const String emptyCartIcon = '${basePath}empty_cart_icon$format';
+  static const String star = '${basePath}star$format';
 }
