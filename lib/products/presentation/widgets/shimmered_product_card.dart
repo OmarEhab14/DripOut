@@ -58,7 +58,7 @@ class ShimmeredProductCard extends StatelessWidget {
                       width: cardWidth * 0.75,
                       decoration: BoxDecoration(
                         color: Colors.black.withAlpha(60),
-                        borderRadius: BorderRadius.circular(10.h)
+                        // borderRadius: BorderRadius.circular(10.h)
                       ),
                     ),
                     5.verticalSpace,
@@ -67,7 +67,7 @@ class ShimmeredProductCard extends StatelessWidget {
                       width: cardWidth,
                       decoration: BoxDecoration(
                           color: Colors.black.withAlpha(60),
-                          borderRadius: BorderRadius.circular(10.h)
+                          // borderRadius: BorderRadius.circular(10.h)
                       ),
                     ),
                     3.verticalSpace,
@@ -78,7 +78,7 @@ class ShimmeredProductCard extends StatelessWidget {
                             height: 12.h,
                             decoration: BoxDecoration(
                                 color: Colors.black.withAlpha(60),
-                                borderRadius: BorderRadius.circular(10.h)
+                                // borderRadius: BorderRadius.circular(10.h)
                             ),
                           ),
                         ),
@@ -88,7 +88,7 @@ class ShimmeredProductCard extends StatelessWidget {
                             height: 12.h,
                             decoration: BoxDecoration(
                                 color: Colors.black.withAlpha(60),
-                                borderRadius: BorderRadius.circular(10.h)
+                                // borderRadius: BorderRadius.circular(10.h)
                             ),
                           ),
                         ),

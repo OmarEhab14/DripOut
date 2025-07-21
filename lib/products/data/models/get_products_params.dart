@@ -1,8 +1,8 @@
 class GetProductsParams {
   final String? search;
   final int? categoryId;
-  final int? minPrice;
-  final int? maxPrice;
+  final double? minPrice;
+  final double? maxPrice;
   final String? size;
   final String? orderBy;
   final int? page;
@@ -35,8 +35,8 @@ class GetProductsParams {
   GetProductsParams copyWith({
     String? search,
     int? categoryId,
-    int? minPrice,
-    int? maxPrice,
+    double? minPrice,
+    double? maxPrice,
     String? size,
     String? orderBy,
     int? page,

@@ -1,20 +1,37 @@
 import 'package:drip_out/common/widgets/button/basic_app_button.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
+import 'package:drip_out/products/data/models/get_products_params.dart';
+import 'package:drip_out/products/presentation/bloc/paginated_products_bloc/paginated_products_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FilterBottomSheet extends StatefulWidget {
+  final double minPrice;
+  final double maxPrice;
+  final List<String> sizes;
+  final BuildContext context;
+
+  const FilterBottomSheet({super.key, required this.context , required this.minPrice, required this.maxPrice, required this.sizes});
   @override
   _FilterBottomSheetState createState() => _FilterBottomSheetState();
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
   String _selectedSort = 'Relevance';
-  RangeValues _priceRange = RangeValues(0, 100);
+  late RangeValues _priceRange;
   var sortOptions = ['Relevance', 'Price:Low-High', 'Price:High-Low'];
-  var sizes = ['S', 'M', 'L', 'XL'];
-  String dropDownValue = 'L';
+  late List<String> sizes;
+  late String dropDownValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _priceRange = RangeValues(widget.minPrice, widget.maxPrice);
+    sizes = ['All', ...widget.sizes];
+    dropDownValue = sizes.first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,9 +181,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         activeColor: AppColors.primaryColor,
         inactiveColor: AppColors.primarySwatch[300],
         values: _priceRange,
-        min: 0,
-        max: 100,
-        divisions: 100,
+        min: widget.minPrice,
+        max: widget.maxPrice,
+        divisions: 50,
         labels: RangeLabels(
           "\$${_priceRange.start.round()}",
           "\$${_priceRange.end.round()}",
@@ -231,8 +248,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           text: 'Apply Filters',
           onPressed: () {
             Navigator.of(context).pop();
-
-            ///ToDo: call filters cubit
+            double minPrice = _priceRange.start;
+            double maxPrice = _priceRange.end;
+            String size = dropDownValue;
+            GetProductsParams params = GetProductsParams(minPrice: minPrice, maxPrice: maxPrice, size: size);
+            widget.context.read<PaginatedProductsCubit>().loadPage(params: params, reset: true);
           }),
     );
   }

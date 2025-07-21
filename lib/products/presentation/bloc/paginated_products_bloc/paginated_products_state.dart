@@ -12,7 +12,10 @@ class PaginatedProductsLoading extends PaginatedProductsState {
 
 class PaginatedProductsLoaded extends PaginatedProductsState {
   final List<ProductModel> products;
-  PaginatedProductsLoaded(this.products);
+  final double minPrice;
+  final double maxPrice;
+  final List<String> sizes;
+  PaginatedProductsLoaded({required this.products, required this.minPrice, required this.maxPrice, required this.sizes});
 }
 
 class PaginatedProductsError extends PaginatedProductsState {

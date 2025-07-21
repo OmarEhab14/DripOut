@@ -36,8 +36,11 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
         products: [],
         pageNumber: 1,
         isLastPage: false,
+        minPrice: 0,
+        maxPrice: 0,
+        sizes: [],
       );
-      emit(PaginatedProductsLoaded([]));
+      emit(PaginatedProductsLoaded(products: [], minPrice: 0, maxPrice: 0, sizes: []));
     }
 
     final cachedState = _categoryStates[_currentCategoryId];
@@ -70,14 +73,20 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
 
     if (result is Success<ProductsResponseModel>) {
       final newProducts = result.data.items;
+      final minPrice = result.data.minPrice;
+      final maxPrice = result.data.maxPrice;
+      final sizes = result.data.sizes;
       final isLastPage = result.data.currentPage >= result.data.totalPages;
       final updatedProducts = [...currentProducts, ...newProducts];
       _categoryStates[_currentCategoryId] = CategoryPaginatedState(
         products: updatedProducts,
         pageNumber: pageNumber + 1,
         isLastPage: isLastPage,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        sizes: sizes,
       );
-      emit(PaginatedProductsLoaded(updatedProducts));
+      emit(PaginatedProductsLoaded(products: updatedProducts, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes));
     } else if (result is Failure<ProductsResponseModel>) {
       emit(PaginatedProductsError(result.apiErrorModel));
     }
@@ -97,7 +106,11 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
     _currentCategoryId = categoryId;
     final CategoryPaginatedState? cached = _categoryStates[categoryId];
     if (cached != null) {
-      emit(PaginatedProductsLoaded(_categoryStates[categoryId]!.products));
+      final products = _categoryStates[categoryId]!.products;
+      final minPrice = _categoryStates[categoryId]!.minPrice;
+      final maxPrice = _categoryStates[categoryId]!.maxPrice;
+      final sizes = _categoryStates[categoryId]!.sizes;
+      emit(PaginatedProductsLoaded(products: products, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes));
     } else {
       loadPage(params: GetProductsParams(categoryId: categoryId), reset: true);
     }
@@ -109,7 +122,7 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
     //   pageNumber: 1,
     //   isLastPage: false,
     // );
-    emit(PaginatedProductsLoaded([]));
+    emit(PaginatedProductsLoaded(products: [], minPrice: 0, maxPrice: 0, sizes: []));
     await loadPage(reset: true);
   }
 

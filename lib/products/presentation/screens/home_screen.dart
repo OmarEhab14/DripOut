@@ -7,7 +7,6 @@ import 'package:drip_out/core/configs/assets/app_vectors.dart';
 import 'package:drip_out/core/configs/theme/app_colors.dart';
 import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
-import 'package:drip_out/products/data/models/get_products_params.dart';
 import 'package:drip_out/products/data/models/product_model.dart';
 import 'package:drip_out/products/domain/usecases/get_categories_usecase.dart';
 import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
@@ -37,11 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
   late final ScrollController _scrollController;
   bool _showSearchBar = true;
-  bool _isRestoringScrollPosition = false;
-
-  // List<String> categories = ['All', 'TShirts', 'Jeans', 'Shoes', 'Shirts'];
-  // PaginatedProductsCubit paginatedProductsCubit =
-  //     PaginatedProductsCubit(sl<GetProductsUseCase>());
 
   @override
   void initState() {
@@ -49,9 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     _scrollController.addListener(() {
-      if (!_isRestoringScrollPosition) {
-        context.read<PaginatedProductsCubit>().saveScrollOffset(_scrollController.offset);
-      }
+      context
+          .read<PaginatedProductsCubit>()
+          .saveScrollOffset(_scrollController.offset);
     });
   }
 
@@ -85,25 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final savedOffset = cubit.getScrollOffset(_selectedCategoryIndex);
 
     if (savedOffset > 0 && _scrollController.hasClients) {
-      _isRestoringScrollPosition = true;
-      // Use post frame callback to ensure the list is built before scrolling
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            savedOffset,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          ).then((_) {
-            _isRestoringScrollPosition = false;
-          });
-        } else {
-          _isRestoringScrollPosition = false;
-        }
-      });
+      _scrollController.jumpTo(savedOffset);
     }
   }
 
-  void _showFilterBottomSheet(BuildContext context) {
+  void _showFilterBottomSheet(BuildContext context, double minPrice, double maxPrice, List<String> sizes) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -111,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        return FilterBottomSheet();
+        return FilterBottomSheet(context: context, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes,);
       },
     );
   }
@@ -134,8 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: Container(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                 color: Colors.white,
                 child: Row(
                   children: [
@@ -143,14 +122,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: AppSearchBar(),
                     ),
                     8.horizontalSpace,
-                    BasicIconButton(
-                      icon: SvgPicture.asset(AppVectors.filterIcon),
-                      onPressed: () {
-                        _showFilterBottomSheet(context);
+                    BlocBuilder<PaginatedProductsCubit, PaginatedProductsState>(
+                      builder: (context, state) {
+                        late double minPrice;
+                        late double maxPrice;
+                        late List<String> sizes;
+                        bool success = false;
+                        if (state is PaginatedProductsLoaded) {
+                          minPrice = state.minPrice;
+                          maxPrice = state.maxPrice;
+                          sizes = state.sizes;
+                          success = true;
+                        }
+                        return BasicIconButton(
+                          icon: SvgPicture.asset(AppVectors.filterIcon),
+                          onPressed: () {
+                            if (success) {
+                              _showFilterBottomSheet(context, minPrice, maxPrice, sizes);
+                            } else {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.white,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                ),
+                                builder: (BuildContext context) {
+                                    return Center(child: Text('Something went wrong'),);
+                                  },
+                              );
+                            }
+                          },
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white,
+                          size: 60.r,
+                        );
                       },
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      size: 60.r,
                     )
                   ],
                 ),
@@ -171,7 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         _selectedCategoryIndex = index;
                       });
                       log('selected category index: $_selectedCategoryIndex');
-                      context.read<PaginatedProductsCubit>().reloadCachedProducts(_selectedCategoryIndex);
+                      context
+                          .read<PaginatedProductsCubit>()
+                          .reloadCachedProducts(_selectedCategoryIndex);
                     },
                   );
                 }
@@ -180,13 +188,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-            child:
-                BlocConsumer<PaginatedProductsCubit, PaginatedProductsState>(
-                  listener: (context, state) {
-                    if (state is PaginatedProductsLoaded && state.products.isNotEmpty) {
-                      _restoreScrollPosition();
-                    }
-                  },
+            child: BlocConsumer<PaginatedProductsCubit, PaginatedProductsState>(
+              listener: (context, state) {
+                if (state is PaginatedProductsLoaded &&
+                    state.products.isNotEmpty) {
+                  _restoreScrollPosition();
+                }
+              },
               builder: (context, state) {
                 if (state is PaginatedProductsLoading &&
                     state.oldProducts.isEmpty) {
@@ -206,8 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   products = state.products;
                 } else if (state is PaginatedProductsError &&
                     products.isEmpty) {
-                  return _buildProductsErrorMessage(
-                      state.error.message, cubit);
+                  return _buildProductsErrorMessage(state.error.message, cubit);
                 } else if (state is PaginatedProductsError) {
                   loadingMoreDataError = true;
                 }
