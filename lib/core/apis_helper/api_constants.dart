@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'https://quick-sawfly-hugely.ngrok-free.app';
+  static const String baseUrl = 'https://2f097bba3820.ngrok-free.app';
   static const String signUpEndpoint = '/api/Account/Register';
   static const String verifyEndpoint = '/api/Account/Verify';
   static const String loginEndpoint = '/api/Account/Login';

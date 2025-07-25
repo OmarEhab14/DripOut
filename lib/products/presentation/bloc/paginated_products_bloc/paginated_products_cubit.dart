@@ -8,6 +8,7 @@ import 'package:drip_out/products/data/models/product_model.dart';
 import 'package:drip_out/products/data/models/products_response_model.dart';
 import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
 import 'package:drip_out/products/presentation/bloc/paginated_products_bloc/cached_states/category_paginated_state.dart';
+import 'package:drip_out/products/presentation/bloc/paginated_products_bloc/cached_states/filters_metadata.dart';
 import 'package:meta/meta.dart';
 
 part 'paginated_products_state.dart';
@@ -27,25 +28,28 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
 
   final Map<int, CategoryPaginatedState> _categoryStates = {};
   final Map<int, double> _scrollOffsets = {};
+  final Map<int, int> _categoryRequestTokens = {};
+  final Map<int, FiltersMetadata> _initialFilterData = {};
 
   GetProductsParams _currentParams = GetProductsParams();
 
-  Future<void> loadPage({GetProductsParams? params, bool reset = false}) async {
+  Future<void> loadProducts(
+      {GetProductsParams? params, bool reset = false}) async {
+    final currentToken = _categoryRequestTokens[_currentCategoryId];
     if (reset) {
       _categoryStates[_currentCategoryId] = CategoryPaginatedState(
         products: [],
         pageNumber: 1,
         isLastPage: false,
-        minPrice: 0,
-        maxPrice: 0,
-        sizes: [],
       );
-      emit(PaginatedProductsLoaded(products: [], minPrice: 0, maxPrice: 0, sizes: []));
+      emit(PaginatedProductsLoaded(
+        products: [],
+      ));
     }
 
     final cachedState = _categoryStates[_currentCategoryId];
     final pageNumber = cachedState?.pageNumber ?? 1;
-
+    print('wewe');
     if (cachedState?.isLastPage ?? false || loadingNextPage) return;
 
     print('loadPage called with: $params');
@@ -69,61 +73,70 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
 
     final result = await getProductsUseCase(params: effectiveParams);
 
+    if (_categoryRequestTokens[_currentCategoryId] != currentToken) {
+      return;
+    }
+
     loadingNextPage = false;
 
     if (result is Success<ProductsResponseModel>) {
       final newProducts = result.data.items;
-      final minPrice = result.data.minPrice;
-      final maxPrice = result.data.maxPrice;
-      final sizes = result.data.sizes;
+      if (!_initialFilterData.containsKey(_currentCategoryId)) {
+        final minPrice = result.data.minPrice;
+        final maxPrice = result.data.maxPrice;
+        final sizes = result.data.sizes;
+        _initialFilterData[_currentCategoryId] = FiltersMetadata(
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          sizes: sizes,
+        );
+      }
       final isLastPage = result.data.currentPage >= result.data.totalPages;
       final updatedProducts = [...currentProducts, ...newProducts];
       _categoryStates[_currentCategoryId] = CategoryPaginatedState(
         products: updatedProducts,
         pageNumber: pageNumber + 1,
         isLastPage: isLastPage,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
-        sizes: sizes,
       );
-      emit(PaginatedProductsLoaded(products: updatedProducts, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes));
+      emit(PaginatedProductsLoaded(
+        products: updatedProducts,
+      ));
     } else if (result is Failure<ProductsResponseModel>) {
       emit(PaginatedProductsError(result.apiErrorModel));
     }
   }
 
-  void checkIfNeedMoreData(int index) {
+  void checkIfNeedMoreData(int index) async {
     final List<ProductModel> currentProducts = state is PaginatedProductsLoaded
         ? (state as PaginatedProductsLoaded).products
         : [];
 
     if (index == currentProducts.length - nextPageTrigger) {
-      loadPage();
+      await loadProducts();
     }
   }
 
-  void reloadCachedProducts(int categoryId) {
+  void loadCategoryProducts(int categoryId) async {
     _currentCategoryId = categoryId;
+    _categoryRequestTokens[_currentCategoryId] =
+        (_categoryRequestTokens[_currentCategoryId] ?? 0) + 1;
     final CategoryPaginatedState? cached = _categoryStates[categoryId];
-    if (cached != null) {
+    if (cached != null && cached.products.isNotEmpty) {
       final products = _categoryStates[categoryId]!.products;
-      final minPrice = _categoryStates[categoryId]!.minPrice;
-      final maxPrice = _categoryStates[categoryId]!.maxPrice;
-      final sizes = _categoryStates[categoryId]!.sizes;
-      emit(PaginatedProductsLoaded(products: products, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes));
+      emit(PaginatedProductsLoaded(
+        products: products,
+      ));
     } else {
-      loadPage(params: GetProductsParams(categoryId: categoryId), reset: true);
+      await loadProducts(
+          params: GetProductsParams(categoryId: categoryId), reset: true);
     }
   }
 
   Future<void> refresh() async {
-    // _categoryStates[_currentCategoryId] = CategoryPaginatedState(
-    //   products: [],
-    //   pageNumber: 1,
-    //   isLastPage: false,
-    // );
-    emit(PaginatedProductsLoaded(products: [], minPrice: 0, maxPrice: 0, sizes: []));
-    await loadPage(reset: true);
+    emit(PaginatedProductsLoaded(
+      products: [],
+    ));
+    await loadProducts(reset: true);
   }
 
   void saveScrollOffset(double scrollOffset) {
@@ -134,4 +147,7 @@ class PaginatedProductsCubit extends Cubit<PaginatedProductsState> {
     return _scrollOffsets[categoryId] ?? 0;
   }
 
+  FiltersMetadata? getInitialFilters(int categoryId) {
+    return _initialFilterData[categoryId];
+  }
 }

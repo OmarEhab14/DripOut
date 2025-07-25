@@ -1,0 +1,2 @@
+D:/omar_projects/DripOut/DripOut/android/app/.cxx/Debug/z4c5ngh2/x86/CMakeFiles/edit_cache.dir
+D:/omar_projects/DripOut/DripOut/android/app/.cxx/Debug/z4c5ngh2/x86/CMakeFiles/rebuild_cache.dir

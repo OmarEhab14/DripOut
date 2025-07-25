@@ -9,7 +9,6 @@ import 'package:drip_out/common/widgets/app_bar/basic_app_bar.dart';
 import 'package:drip_out/core/dependency_injection/service_locator.dart';
 import 'package:drip_out/products/data/models/product_model.dart';
 import 'package:drip_out/products/domain/usecases/get_categories_usecase.dart';
-import 'package:drip_out/products/domain/usecases/get_products_usecase.dart';
 import 'package:drip_out/products/presentation/bloc/categories_bloc/categories_cubit.dart';
 import 'package:drip_out/products/presentation/bloc/paginated_products_bloc/paginated_products_cubit.dart';
 import 'package:drip_out/products/presentation/widgets/category_bar.dart';
@@ -36,10 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
   late final ScrollController _scrollController;
   bool _showSearchBar = true;
+  late Map<int, bool> loadingCategoryProductsFinished;
 
   @override
   void initState() {
     super.initState();
+    loadingCategoryProductsFinished = {_selectedCategoryIndex: false};
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     _scrollController.addListener(() {
@@ -90,8 +91,15 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (BuildContext context) {
-        return FilterBottomSheet(context: context, minPrice: minPrice, maxPrice: maxPrice, sizes: sizes,);
+      builder: (BuildContext bottomSheetContext) {
+        return BlocProvider.value(
+          value: context.read<PaginatedProductsCubit>(),
+          child: FilterBottomSheet(
+            minPrice: minPrice,
+            maxPrice: maxPrice,
+            sizes: sizes,
+          ),
+        );
       },
     );
   }
@@ -128,12 +136,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         late double maxPrice;
                         late List<String> sizes;
                         bool success = false;
-                        if (state is PaginatedProductsLoaded) {
-                          minPrice = state.minPrice;
-                          maxPrice = state.maxPrice;
-                          sizes = state.sizes;
+                        final cubit = context.read<PaginatedProductsCubit>();
+                        final initialFilters = cubit.getInitialFilters(_selectedCategoryIndex);
+
+                        if (initialFilters != null) {
+                          minPrice = initialFilters.minPrice;
+                          maxPrice = initialFilters.maxPrice;
+                          sizes = initialFilters.sizes;
                           success = true;
                         }
+
                         return BasicIconButton(
                           icon: SvgPicture.asset(AppVectors.filterIcon),
                           onPressed: () {
@@ -179,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       log('selected category index: $_selectedCategoryIndex');
                       context
                           .read<PaginatedProductsCubit>()
-                          .reloadCachedProducts(_selectedCategoryIndex);
+                          .loadCategoryProducts(_selectedCategoryIndex);
                     },
                   );
                 }
@@ -339,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             IconButton(
                 onPressed: () {
-                  cubit.loadPage();
+                  cubit.loadProducts();
                 },
                 icon: Icon(Icons.refresh)),
           ],

@@ -38,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
     _scrollController = ScrollController();
     screens = [
       BlocProvider(
-        create: (context) => PaginatedProductsCubit(sl<GetProductsUseCase>())..loadPage(),
+        create: (context) => PaginatedProductsCubit(sl<GetProductsUseCase>())..loadCategoryProducts(0),
         child: HomeScreen(
           onBottomNavVisibilityChanged: (shouldShow) {
             setState(() {

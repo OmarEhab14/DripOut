@@ -11,9 +11,8 @@ class FilterBottomSheet extends StatefulWidget {
   final double minPrice;
   final double maxPrice;
   final List<String> sizes;
-  final BuildContext context;
 
-  const FilterBottomSheet({super.key, required this.context , required this.minPrice, required this.maxPrice, required this.sizes});
+  const FilterBottomSheet({super.key, required this.minPrice, required this.maxPrice, required this.sizes});
   @override
   _FilterBottomSheetState createState() => _FilterBottomSheetState();
 }
@@ -242,18 +241,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget applyFiltersButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: BasicAppButton(
-          text: 'Apply Filters',
-          onPressed: () {
-            Navigator.of(context).pop();
-            double minPrice = _priceRange.start;
-            double maxPrice = _priceRange.end;
-            String size = dropDownValue;
-            GetProductsParams params = GetProductsParams(minPrice: minPrice, maxPrice: maxPrice, size: size);
-            widget.context.read<PaginatedProductsCubit>().loadPage(params: params, reset: true);
-          }),
-    );
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: BasicAppButton(
+              text: 'Apply Filters',
+              onPressed: () {
+                Navigator.of(context).pop();
+                double minPrice = _priceRange.start;
+                double maxPrice = _priceRange.end;
+                String? size = dropDownValue == 'All' ? null : dropDownValue;
+                GetProductsParams params = GetProductsParams(minPrice: minPrice, maxPrice: maxPrice, size: size);
+                context.read<PaginatedProductsCubit>().loadProducts(params: params, reset: true);
+              }),
+        );
   }
 }
